@@ -1,0 +1,61 @@
+ion-content {
+    --ion-background-color: #2f2f2f;
+}
+#link {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 99;
+    color: white;
+    font-size: 20px;
+    background-color: black;
+    padding: 2.5px;
+}
+
+#campus {
+    position: relative;
+}
+
+a {
+    color: black;
+}
+
+.text-center {
+    text-align: center;
+}
+
+.font-md {
+    font-size: 20px;
+}
+
+.pb-3 {
+    padding-bottom: 7.5px;
+}
+
+.font-white {
+    color: white;
+}
+
+.fab-label {
+    position: relative;
+    background: lightslategrey;
+    height: 50px;
+    line-height: 35px;
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    border-radius: 5px;
+    box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
+}
+.fab-label-att {
+    margin-left: -60px; /* Custom for each label */
+}
+.fab {
+    contain: initial;
+}
+
+button {
+    padding: 0;
+}
