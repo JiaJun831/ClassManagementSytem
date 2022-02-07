@@ -1,0 +1,7 @@
+{
+  "name": "Class Management System",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}
