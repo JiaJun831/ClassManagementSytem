@@ -1,0 +1,45 @@
+<!-- <ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      Home
+    </ion-title>
+  </ion-toolbar>
+</ion-header> -->
+
+<ion-content [fullscreen]="true">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <button>
+        <div class="fab-label fab-label-att">View Attendance</div>
+      </button>
+    </ion-fab-list>
+  </ion-fab>
+
+  <ion-header collapse="condense">
+
+    <ion-toolbar>
+      <ion-title size="large">Home</ion-title>
+    </ion-toolbar>
+    <div class="text-center font-md pb-3">
+      <ion-text>Welcome</ion-text>
+    </div>
+    <div>
+
+    </div>
+    <!-- <div> -->
+    <ion-item-divider class="text-center">
+      <ion-label id="link" (click)="openBrowser()">Visit DKIT</ion-label>
+      <ion-img id="campus" src="../../assets/campus.png"></ion-img>
+
+    </ion-item-divider>
+
+
+
+    <!-- </div> -->
+  </ion-header>
+
+
+</ion-content>
