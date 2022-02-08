@@ -3,7 +3,7 @@ import { IonicModule } from '@ionic/angular';
 
 import { SettingPage } from './setting.page';
 
-describe('SettingPage', () => {
+describe('Tab3Page', () => {
   let component: SettingPage;
   let fixture: ComponentFixture<SettingPage>;
 

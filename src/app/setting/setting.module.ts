@@ -12,7 +12,7 @@ import { SettingPageRoutingModule } from './setting-routing.module';
     IonicModule,
     CommonModule,
     FormsModule,
-    RouterModule.forChild([{ path: '', component: SettingPage }]),
+    // RouterModule.forChild([{ path: '', component: SettingPage }]),
     SettingPageRoutingModule,
   ],
   declarations: [SettingPage],

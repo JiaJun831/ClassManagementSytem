@@ -13,9 +13,9 @@ const routes: Routes = [
           import('../home/home.module').then((m) => m.Tab1PageModule),
       },
       {
-        path: 'tab2',
+        path: 'timetable',
         loadChildren: () =>
-          import('../timetable/tab2.module').then((m) => m.Tab2PageModule),
+          import('../timetable/timetable.module').then((m) => m.Tab2PageModule),
       },
       {
         path: 'setting',
