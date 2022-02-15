@@ -17,16 +17,4 @@ export class HomePage {
   // ngOnInit() {
   //   this.presentLoadingDefault();
   // }
-
-  // async presentLoadingDefault() {
-  //   let loading = await this.loadingCtrl.create({
-  //     message: 'Please wait...',
-  //   });
-
-  //   await loading.present();
-
-  //   setTimeout(() => {
-  //     loading.dismiss();
-  //   }, 5000);
-  // }
 }

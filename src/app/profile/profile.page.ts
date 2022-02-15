@@ -62,15 +62,11 @@ export class ProfilePage implements OnInit {
       console.log(this.formData.value);
       return false;
     } else {
-      this.http
-        .put<Student>(
-          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
-            this.id,
-          this.formData.value
-        )
-        .subscribe((data) => {
-          // th = data.id;
-        });
+      this.http.put<Student>(
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+          this.id,
+        this.formData.value
+      );
     }
     console.log(this.formData.value);
     console.log(this.id);
