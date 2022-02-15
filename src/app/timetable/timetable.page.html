@@ -7,10 +7,26 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">Timetable</ion-title>
-    </ion-toolbar>
-  </ion-header>
 
+  <!-- <ion-col *ngFor="let test of movieList">
+    <p>{{test.id}}</p>
+    <p>{{test.classes}}</p>
+    <ion-col *ngFor="let class of test.classes">
+      <p>{{class.timeslots}}</p>
+      <ion-col *ngFor="let times of class.timeslots">
+        <p>{{times}}</p>
+      </ion-col>
+
+    </ion-col>
+  </ion-col> -->
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button fab-icon>
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+    <ion-fab-list side="top">
+      <button>
+        <div class="fab-label fab-label-att" [routerLink]="['/modify-timetable']">Modify Timetable</div>
+      </button>
+    </ion-fab-list>
+  </ion-fab>
 </ion-content>

@@ -1,4 +1,4 @@
-export interface User {
+export interface Lecturer {
   id: number;
   FirstName: string;
   LastName: string;
@@ -13,6 +13,6 @@ export interface User {
   CourseID: number;
 }
 
-export interface UserLIst {
-  userlist: Array<User>;
+export interface LecturerList {
+  userlist: Array<Lecturer>;
 }

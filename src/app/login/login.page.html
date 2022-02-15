@@ -1,9 +1,31 @@
 <ion-header>
   <ion-toolbar>
-    <ion-title>login</ion-title>
+    <ion-title>Login</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-
+  <div id="log-text">
+    <h3>Login</h3>
+    <p>Please sign in to continue.</p>
+  </div>
+  <form>
+    <ion-item lines="full">
+      <ion-label position="floating">
+        <ion-icon name="mail-outline"></ion-icon> EMAIL
+      </ion-label>
+      <ion-input type="email" required></ion-input>
+    </ion-item>
+    <ion-item lines="full">
+      <ion-label position="floating">
+        <ion-icon name="lock-closed-outline"></ion-icon> PASSWORD
+      </ion-label>
+      <ion-input type="password" required></ion-input>
+    </ion-item>
+    <ion-row>
+      <ion-col>
+        <ion-button id="login" type="submit" expand="block">LOGIN</ion-button>
+      </ion-col>
+    </ion-row>
+  </form>
 </ion-content>
