@@ -1,9 +1,12 @@
-ion-content {
-    --ion-background-color: #2f2f2f;
+[fab-icon] {
+    --background: #60c689;
+    --background-focused: #32313b;
+    --background-activated: #32313b;
 }
+
 #link {
     position: absolute;
-    top: 55%;
+    top: 20%; // change this when the page redesign
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 99;
@@ -15,6 +18,7 @@ ion-content {
 
 #campus {
     position: relative;
+    opacity: 0.8;
 }
 
 a {
@@ -39,7 +43,8 @@ a {
 
 .fab-label {
     position: relative;
-    background: lightslategrey;
+    background: #60c689;
+    color: black;
     height: 50px;
     line-height: 35px;
     padding-left: 6px;
