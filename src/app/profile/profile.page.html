@@ -12,21 +12,21 @@
     </ion-avatar>
     <ion-item lines="full">
       <ion-label position="floating">First Name</ion-label>
-      <ion-input type="text" formControlName="FirstName" required></ion-input>
+      <ion-input type="text" value="{{user.FirstName}}" formControlName="FirstName" required></ion-input>
     </ion-item>
     <span class="error ion-padding" *ngIf="isSubmitted && errorControl.FirstName.errors?.required">
       First Name is required.
     </span>
     <ion-item lines="full">
       <ion-label position="floating">Last Name</ion-label>
-      <ion-input type="text" formControlName="LastName" required></ion-input>
+      <ion-input type="text" value="{{user.LastName}}" formControlName="LastName" required></ion-input>
     </ion-item>
     <span class="error ion-padding" *ngIf="isSubmitted && errorControl.LastName.errors?.required">
       Last Name is required.
     </span>
     <ion-item lines="full">
       <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" formControlName="Email" required></ion-input>
+      <ion-input type="email" value="{{user.Email}}" formControlName="EmailControl" required></ion-input>
     </ion-item>
     <span class="error ion-padding" *ngIf="isSubmitted && errorControl.Email.errors?.required">
       Email Address is required.

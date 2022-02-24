@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Student } from '../interfaces/interface.student';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-profile',
@@ -13,16 +14,7 @@ export class ProfilePage implements OnInit {
   formData: FormGroup;
   id: string;
   isSubmitted = false;
-  // public FirstName: String;
-  // public LastName: String;
-  // public AddressLine1: String;
-  // public AddressLine2: String;
-  // public County: String;
-  // public Country: String;
-  // public Email: String;
-  // public Mobile: String;
-  // public DOB: Date;
-  // public EirCode: String;
+  user = <any>{};
 
   constructor(
     private http: HttpClient,
@@ -38,7 +30,7 @@ export class ProfilePage implements OnInit {
       LastName: new FormControl('', Validators.required),
       County: new FormControl('', Validators.required),
       Country: new FormControl('Ireland'),
-      Email: new FormControl(
+      EmailControl: new FormControl(
         '',
         Validators.compose([
           Validators.required,
@@ -48,6 +40,10 @@ export class ProfilePage implements OnInit {
       MobileNumber: new FormControl('', Validators.required),
       EirCode: new FormControl('', Validators.required),
       DOB: new FormControl('', Validators.required),
+    });
+    this.getData('user').then((res) => {
+      this.user = JSON.parse(res);
+      console.log(this.user);
     });
   }
 
@@ -70,5 +66,10 @@ export class ProfilePage implements OnInit {
     }
     console.log(this.formData.value);
     console.log(this.id);
+  }
+
+  async getData(input: string) {
+    const { value } = await Storage.get({ key: input });
+    return value;
   }
 }

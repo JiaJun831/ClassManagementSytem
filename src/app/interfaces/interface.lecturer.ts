@@ -10,7 +10,7 @@ export interface Lecturer {
   Mobile: string;
   DOB: Date;
   Email: string;
-  CourseID: number;
+  ModuleID: number;
 }
 
 export interface LecturerList {

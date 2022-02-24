@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Storage } from '@capacitor/storage';
+import { Platform } from '@ionic/angular';
 
 @Component({
   selector: 'app-login',
@@ -11,16 +12,32 @@ import { Storage } from '@capacitor/storage';
 })
 export class LoginPage implements OnInit {
   loginForm: FormGroup;
-  id: null;
-  student: any;
-  lecturer: any;
-  constructor(public router: Router, private http: HttpClient) {}
+  subscription: any;
+
+  constructor(
+    public router: Router,
+    private http: HttpClient,
+    private platform: Platform
+  ) {}
 
   ngOnInit() {
     this.loginForm = new FormGroup({
       email: new FormControl('', Validators.required),
       password: new FormControl('', Validators.required),
     });
+  }
+
+  ionViewDidEnter() {
+    this.subscription = this.platform.backButton.subscribeWithPriority(
+      9999,
+      () => {
+        // do nothing
+      }
+    );
+  }
+
+  ionViewWillLeave() {
+    this.subscription.unsubscribe();
   }
 
   login() {
@@ -31,40 +48,35 @@ export class LoginPage implements OnInit {
       )
       .subscribe((res) => {
         console.log(res);
-        // this.router.navigate(['./tabs/home']);
+        this.router.navigate(['../tabs/home']);
         if (this.loginForm.controls['email'].value.includes('student')) {
           this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/students/email/' +
-                this.loginForm.controls['email'].value
+                this.loginForm.controls['email'].value.toLowerCase()
             )
             .subscribe((res) => {
-              this.student = res;
-              setData(res[0].id);
-              // getData('userID').then((res) => {
-              //   console.log(res);
-              // });
+              this.setData('userID', res[0].id);
+              this.setData('user', JSON.stringify(res[0].data));
+              this.setData('role', 'student');
             });
         } else {
           this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/lecturers/email/' +
-                this.loginForm.controls['email'].value
+                this.loginForm.controls['email'].value.toLowerCase()
             )
             .subscribe((res) => {
-              console.log(res);
+              this.setData('userID', res[0].id);
+              this.setData('user', JSON.stringify(res[0].data));
+              this.setData('role', 'lecturer');
             });
         }
       });
+  }
 
-    function setData(value: string) {
-      // Store the value under "my-key"
-      Storage.set({ key: 'userID', value: value });
-    }
-
-    async function getData(input: string) {
-      const { value } = await Storage.get({ key: input });
-      return value;
-    }
+  setData(key: string, value: string) {
+    // Store the value under "my-key"
+    Storage.set({ key: key, value: value });
   }
 }

@@ -3,38 +3,54 @@ import { PreloadAllModules, RouterModule, Routes } from '@angular/router';
 
 const routes: Routes = [
   {
-    path: '',
-    loadChildren: () => import('./tabs/tabs.module').then(m => m.TabsPageModule)
-  },  {
+    path: 'tabs',
+    loadChildren: () =>
+      import('./tabs/tabs.module').then((m) => m.TabsPageModule),
+  },
+  {
     path: 'profile',
-    loadChildren: () => import('./profile/profile.module').then( m => m.ProfilePageModule)
+    loadChildren: () =>
+      import('./profile/profile.module').then((m) => m.ProfilePageModule),
   },
   {
     path: 'about-us',
-    loadChildren: () => import('./about-us/about-us.module').then( m => m.AboutUsPageModule)
+    loadChildren: () =>
+      import('./about-us/about-us.module').then((m) => m.AboutUsPageModule),
   },
   {
     path: 'view-attendance',
-    loadChildren: () => import('./view-attendance/view-attendance.module').then( m => m.ViewAttendancePageModule)
+    loadChildren: () =>
+      import('./view-attendance/view-attendance.module').then(
+        (m) => m.ViewAttendancePageModule
+      ),
   },
   {
     path: 'modify-timetable',
-    loadChildren: () => import('./modify-timetable/modify-timetable.module').then( m => m.ModifyTimetablePageModule)
+    loadChildren: () =>
+      import('./modify-timetable/modify-timetable.module').then(
+        (m) => m.ModifyTimetablePageModule
+      ),
   },
   {
     path: 'login',
-    loadChildren: () => import('./login/login.module').then( m => m.LoginPageModule)
+    loadChildren: () =>
+      import('./login/login.module').then((m) => m.LoginPageModule),
   },
   {
     path: 'support',
-    loadChildren: () => import('./support/support.module').then( m => m.SupportPageModule)
-  }
-
+    loadChildren: () =>
+      import('./support/support.module').then((m) => m.SupportPageModule),
+  },
+  {
+    path: '',
+    redirectTo: 'login',
+    pathMatch: 'full',
+  },
 ];
 @NgModule({
   imports: [
-    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules })
+    RouterModule.forRoot(routes, { preloadingStrategy: PreloadAllModules }),
   ],
-  exports: [RouterModule]
+  exports: [RouterModule],
 })
 export class AppRoutingModule {}
