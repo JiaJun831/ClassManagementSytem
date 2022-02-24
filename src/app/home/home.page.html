@@ -7,7 +7,7 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="lecturer">
     <ion-fab-button fab-icon>
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
@@ -19,20 +19,64 @@
   </ion-fab>
 
   <div class="text-center font-md pb-3">
-    <ion-text>Welcome</ion-text>
+    <ion-text>Welcome {{firstName}}</ion-text>
   </div>
-  <div>
 
-  </div>
   <div>
-    <!-- <ion-item-divider class="text-center"> -->
     <ion-label id="link" (click)="openBrowser()">Visit DKIT</ion-label>
     <ion-img id="campus" src="../../assets/campus.png"></ion-img>
-
-    <!-- </ion-item-divider> -->
-
-
-
   </div>
 
+  <div>
+    <h3>Schedule</h3>
+    <div *ngFor="let listContent of list">
+      <div *ngFor="let ts of listContent">
+
+        <span *ngIf="1 == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Monday'">
+            <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <small>
+                {{ts.data.timeslot.classroom}}</small>
+            </p>
+          </div>
+        </span>
+        <span *ngIf="2 == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Tuesday'">
+
+            <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <small>
+                {{ts.data.timeslot.classroom}}</small>
+            </p>
+          </div>
+        </span>
+        <span *ngIf="3 == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Wednesday'">
+            {{result.get(ts.data.module_id.toString())}}
+            <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <small>
+                {{ts.data.timeslot.classroom}}</small>
+            </p>
+          </div>
+        </span>
+        <span *ngIf="4 == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Thursday'">
+            <h3>Schedule</h3>
+            <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <small>
+                {{ts.data.timeslot.classroom}}</small>
+            </p>
+          </div>
+        </span>
+        <span *ngIf="5 == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Friday'">
+            <h3>Schedule</h3>
+            <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <small>
+                {{ts.data.timeslot.classroom}}</small>
+            </p>
+          </div>
+        </span>
+      </div>
+    </div>
+  </div>
 </ion-content>
