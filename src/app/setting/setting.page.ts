@@ -8,11 +8,24 @@ import { Storage } from '@capacitor/storage';
 })
 export class SettingPage {
   constructor(public router: Router) {}
+  firstLetter;
+
+  ngOnInit() {
+    this.getData('user').then((res) => {
+      let jsonRes = JSON.parse(res);
+      this.firstLetter = jsonRes.FirstName.substring(0, 1);
+    });
+  }
 
   logout() {
     this.router.navigate(['../login']);
     Storage.remove({ key: 'user' });
     Storage.remove({ key: 'role' });
     Storage.remove({ key: 'userID' });
+  }
+
+  async getData(input: string) {
+    const { value } = await Storage.get({ key: input });
+    return value;
   }
 }

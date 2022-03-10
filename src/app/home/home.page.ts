@@ -23,6 +23,7 @@ export class HomePage implements OnInit {
   firstName: any;
   today: Date;
   time: any;
+  course;
   result = new Map();
   day: any;
   list: any[] = [];
@@ -38,8 +39,10 @@ export class HomePage implements OnInit {
     this.getData('role').then((res) => {
       if (res == 'lecturer') {
         this.lecturer = true;
+        this.getCourse();
       } else {
         this.lecturer = false;
+        this.getCourse();
       }
     });
     this.getData('user').then((res) => {
@@ -50,12 +53,22 @@ export class HomePage implements OnInit {
       this.time = this.getCurrentTime();
     }, 1000);
 
-    this.getClasses();
-
     const isPushNotificationsAvailable =
       Capacitor.isPluginAvailable('PushNotifications');
 
     if (isPushNotificationsAvailable) {
+      // Request permission to use push notifications
+      // iOS will prompt user and return if they granted permission or not
+      // Android will just grant without prompting
+      PushNotifications.requestPermissions().then((result) => {
+        if (result.receive === 'granted') {
+          // Register with Apple / Google to receive push via APNS/FCM
+          PushNotifications.register();
+        } else {
+          // Show some error
+        }
+      });
+
       PushNotifications.addListener('registration', (token: Token) => {
         alert('Push registration success, token: ' + token.value);
       });
@@ -77,17 +90,6 @@ export class HomePage implements OnInit {
           alert('Push action performed: ' + JSON.stringify(notification));
         }
       );
-      // Request permission to use push notifications
-      // iOS will prompt user and return if they granted permission or not
-      // Android will just grant without prompting
-      PushNotifications.requestPermissions().then((result) => {
-        if (result.receive === 'granted') {
-          // Register with Apple / Google to receive push via APNS/FCM
-          PushNotifications.register();
-        } else {
-          // Show some error
-        }
-      });
     }
   }
 
@@ -106,30 +108,48 @@ export class HomePage implements OnInit {
     return this.today.getDay();
   }
 
-  getClasses() {
-    let resJson: { module_id: string | any[] };
+  getCourse() {
+    let resJson;
+    let test = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
-      for (let i = 0; i < resJson.module_id.length; i++) {
-        this.http
-          .get<moduleList>(
-            'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/' +
-              resJson.module_id[i]
-          )
-          .subscribe((data) => {
-            console.log(data);
-            this.http
-              .get(
-                'http://localhost:5000/attendancetracker-a53a9/us-central1/api/modules/' +
-                  resJson.module_id[i]
-              )
-              .subscribe((data2) => {
-                this.result.set(resJson.module_id[i], data2['Name']);
-              });
-            this.list.push(data);
-          });
-      }
-      console.log(this.list);
+      console.log(resJson);
+      this.http
+        .get(
+          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/' +
+            resJson.CourseID
+        )
+        .subscribe((data) => {
+          console.log(data);
+          this.course = data;
+          for (let i = 0; i < this.course['moduleList'].length; i++) {
+            let parseValue = parseInt(this.course['moduleList'][i]);
+            test += parseValue + ',';
+          }
+
+          let postData = {
+            test: test.substring(0, test.length - 1),
+          };
+          this.http
+            .post(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
+              postData
+            )
+            .subscribe((data) => {
+              for (let i = 0; i < Object.keys(data).length; i++) {
+                this.http
+                  .get(
+                    'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+                      data[i].data.module_id
+                  )
+                  .subscribe((res) => {
+                    data[i].data.module_name = res['Name'];
+                  });
+              }
+              this.list.push(data);
+              console.log(this.list);
+            });
+        });
       return this.list;
     });
   }

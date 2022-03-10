@@ -31,16 +31,16 @@
     <h3>Schedule</h3>
     <div *ngFor="let listContent of list">
       <div *ngFor="let ts of listContent">
-
-        <span *ngIf="1 == getToday()">
-          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Monday'">
+        <span *ngIf="ts.data.timeslot.dayIndex == getToday()">
+          <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time">
             <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
               <small>
                 {{ts.data.timeslot.classroom}}</small>
             </p>
+            <p>{{ts.data.module_name}}</p>
           </div>
         </span>
-        <span *ngIf="2 == getToday()">
+        <!-- <span *ngIf="2 == getToday()">
           <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Tuesday'">
 
             <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
@@ -60,7 +60,6 @@
         </span>
         <span *ngIf="4 == getToday()">
           <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Thursday'">
-            <h3>Schedule</h3>
             <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
               <small>
                 {{ts.data.timeslot.classroom}}</small>
@@ -69,13 +68,14 @@
         </span>
         <span *ngIf="5 == getToday()">
           <div *ngIf="ts.data.timeslot.start_time.substring(0,2) > time && ts.data.timeslot.day == 'Friday'">
-            <h3>Schedule</h3>
             <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
               <small>
                 {{ts.data.timeslot.classroom}}</small>
+
             </p>
+            <p>{{ts.data.module_name}}</p>
           </div>
-        </span>
+        </span> -->
       </div>
     </div>
   </div>

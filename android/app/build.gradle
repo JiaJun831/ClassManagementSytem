@@ -30,6 +30,7 @@ repositories {
 }
 
 dependencies {
+    implementation 'com.google.firebase:firebase-iid'
     implementation platform('com.google.firebase:firebase-bom:29.1.0')
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.google.firebase:firebase-analytics'
