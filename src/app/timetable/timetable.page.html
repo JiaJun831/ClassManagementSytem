@@ -20,84 +20,83 @@
       </button>
     </ion-fab-list>
   </ion-fab>
-  <div *ngIf="lecturer">
-    <ion-list>
-      <ion-item>
-        <ion-label>Module</ion-label>
-        <ion-label>Classroom</ion-label>
-        <ion-label>From</ion-label>
-        <ion-label>To</ion-label>
-      </ion-item>
-    </ion-list>
-    <div *ngFor="let listContent of list">
-      <div *ngFor="let ts of listContent">
-        <div *ngIf="ts.data.timeslot.day == 'Monday'">
-          <h5>Monday</h5>
-          <ion-list>
-            <ion-item>
-              <ion-label>{{ts.data.module_id}}</ion-label>
-              <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
-              <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-              </ion-label>
-              <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </div>
-        <div *ngIf="ts.data.timeslot.day == 'Tuesday'">
-          <h5>Tuesday</h5>
-          <ion-list>
-            <ion-item>
-              <ion-label>{{ts.data.module_id}}</ion-label>
-              <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
-              <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-              </ion-label>
-              <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </div>
-        <div *ngIf="ts.data.timeslot.day == 'Wednesday'">
-          <h5>Wednesday</h5>
-          <ion-list>
-            <ion-item>
-              <ion-label>{{ts.data.module_id}}</ion-label>
-              <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
-              <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-              </ion-label>
-              <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </div>
-        <div *ngIf="ts.data.timeslot.day == 'Thursday'">
-          <h5>Thursday</h5>
-          <ion-list>
-            <ion-item>
-              <ion-label>{{ts.data.module_id}}</ion-label>
-              <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
-              <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-              </ion-label>
-              <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </div>
-        <div *ngIf="ts.data.timeslot.day == 'Friday'">
-          <h5>Friday</h5>
-          <ion-list>
-            <ion-item>
-              <ion-label>{{ts.data.module_id}}</ion-label>
-              <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
-              <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-              </ion-label>
-              <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
-              </ion-label>
-            </ion-item>
-          </ion-list>
-        </div>
+  <ion-list>
+    <ion-item>
+      <ion-label>Module</ion-label>
+      <ion-label>Classroom</ion-label>
+      <ion-label>From</ion-label>
+      <ion-label>To</ion-label>
+    </ion-item>
+  </ion-list>
+  <div *ngFor="let listContent of list">
+    <div *ngFor="let ts of listContent">
+      <div *ngIf="ts.data.timeslot.dayIndex == 1">
+        <h5>Monday</h5>
+        <ion-list>
+          <ion-item>
+            <ion-label>{{ts.data.module_id}}</ion-label>
+            <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
+            <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+            </ion-label>
+            <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div *ngIf="ts.data.timeslot.dayIndex == 2">
+        <h5>Tuesday</h5>
+        <ion-list>
+          <ion-item>
+            <ion-label>{{ts.data.module_id}}</ion-label>
+            <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
+            <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+            </ion-label>
+            <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div *ngIf="ts.data.timeslot.dayIndex == 3">
+        <h5>Wednesday</h5>
+        <ion-list>
+          <ion-item>
+            <ion-label>{{ts.data.module_name}}</ion-label>
+            <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
+            <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+            </ion-label>
+            <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div *ngIf="ts.data.timeslot.dayIndex == 4">
+        <h5>Thursday</h5>
+        <ion-list>
+          <ion-item>
+            <ion-label>{{ts.data.module_name}}</ion-label>
+            <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
+            <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+            </ion-label>
+            <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </div>
+      <div *ngIf="ts.data.timeslot.dayIndex == 5">
+        <h5>Friday</h5>
+        <ion-list>
+          <ion-item>
+            <ion-label>{{ts.data.module_id}}</ion-label>
+            <ion-label>{{ts.data.timeslot.classroom}}</ion-label>
+            <ion-label>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+            </ion-label>
+            <ion-label>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+            </ion-label>
+          </ion-item>
+        </ion-list>
       </div>
     </div>
+    <!-- </div> -->
 
 
 

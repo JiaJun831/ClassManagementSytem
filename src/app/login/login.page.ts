@@ -47,8 +47,6 @@ export class LoginPage implements OnInit {
         this.loginForm.value
       )
       .subscribe((res) => {
-        console.log(res);
-        this.router.navigate(['../tabs/home']);
         if (this.loginForm.controls['email'].value.includes('student')) {
           this.http
             .get(
@@ -59,6 +57,7 @@ export class LoginPage implements OnInit {
               this.setData('userID', res[0].id);
               this.setData('user', JSON.stringify(res[0].data));
               this.setData('role', 'student');
+              this.router.navigate(['../tabs/home']);
             });
         } else {
           this.http
@@ -70,6 +69,7 @@ export class LoginPage implements OnInit {
               this.setData('userID', res[0].id);
               this.setData('user', JSON.stringify(res[0].data));
               this.setData('role', 'lecturer');
+              this.router.navigate(['../tabs/home']);
             });
         }
       });
