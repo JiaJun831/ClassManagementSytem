@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Student } from '../interfaces/interface.student';
 import { Storage } from '@capacitor/storage';
+import { User } from '../interfaces/interface.lecturer';
 
 @Component({
   selector: 'app-profile',
@@ -30,7 +31,7 @@ export class ProfilePage implements OnInit {
       LastName: new FormControl('', Validators.required),
       County: new FormControl('', Validators.required),
       Country: new FormControl('Ireland'),
-      CourseID: new FormControl(''),
+      // CourseID: new FormControl(''),
       MobileNumber: new FormControl('', Validators.required),
       EirCode: new FormControl('', Validators.required),
       DOB: new FormControl('', Validators.required),
@@ -54,9 +55,9 @@ export class ProfilePage implements OnInit {
         MobileNumber: this.user.MobileNumber,
         EirCode: this.user.EirCode,
         DOB: this.user.DOB,
-        CourseID: this.user.CourseID,
+        // CourseID: this.user.CourseID,
       });
-      console.log(this.user);
+      // console.log(this.user);
     });
   }
 
@@ -64,7 +65,7 @@ export class ProfilePage implements OnInit {
     return this.formData.controls;
   }
 
-  updateStudent() {
+  updateProfile() {
     this.isSubmitted = true;
     if (!this.formData.valid) {
       console.log('Please provide all the required values!');
@@ -72,18 +73,15 @@ export class ProfilePage implements OnInit {
       return false;
     } else {
       this.getData('userID').then((res) => {
-        console.log(this.formData.value);
-        this.http
-          .put<Student>(
-            // 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/students/' +
-            'http://localhost:5000/attendancetracker-a53a9/us-central1/api/students/' +
-              res,
+        this.getData('role').then((role) => {
+          console.log(this.formData.value);
+          this.http.put<User>(
+            // 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/' +
+            'http://localhost:5000/attendancetracker-a53a9/us-central1/api/students/1',
+            // res,
             this.formData.value
-          )
-          .subscribe((res) => {
-            console.log(res);
-          });
-        // console.log('success');
+          );
+        });
       });
     }
   }

@@ -7,6 +7,8 @@
     border: 1px solid black;
     margin-bottom: 5px;
     margin-top: 5px;
+    // text-align: center;
+    justify-content: safe center;
 }
 
 ion-item {
@@ -15,7 +17,8 @@ ion-item {
 
 p {
     text-align: center;
-    font-size: 30px;
-    margin-top: 6px;
+    justify-content: center;
+    // font-size: 30px;
+    margin-top: 15px;
     margin-bottom: 3px;
 }
