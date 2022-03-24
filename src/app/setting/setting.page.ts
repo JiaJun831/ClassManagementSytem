@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { PushNotifications } from '@capacitor/push-notifications';
 import { Storage } from '@capacitor/storage';
 @Component({
   selector: 'app-setting',
@@ -22,6 +23,7 @@ export class SettingPage {
     Storage.remove({ key: 'user' });
     Storage.remove({ key: 'role' });
     Storage.remove({ key: 'userID' });
+    PushNotifications.removeAllListeners();
   }
 
   async getData(input: string) {

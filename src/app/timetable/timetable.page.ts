@@ -61,6 +61,16 @@ export class TimetablePage {
           data
         )
         .subscribe((data) => {
+          for (let i = 0; i < Object.keys(data).length; i++) {
+            this.http
+              .get(
+                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+                  data[i].data.module_id
+              )
+              .subscribe((res) => {
+                data[i].data.module_name = res['Name'];
+              });
+          }
           this.list.push(data);
           console.log(this.list);
         });
@@ -90,6 +100,7 @@ export class TimetablePage {
           let postData = {
             test: test.substring(0, test.length - 1),
           };
+          console.log(postData);
           this.http
             .post(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
