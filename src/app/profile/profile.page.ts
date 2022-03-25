@@ -2,10 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { Student } from '../interfaces/interface.student';
 import { Storage } from '@capacitor/storage';
-import { User } from '../interfaces/interface.lecturer';
-
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -24,6 +21,7 @@ export class ProfilePage implements OnInit {
 
   ngOnInit() {
     this.id = this.activatedRoute.snapshot.paramMap.get('id');
+
     this.formData = new FormGroup({
       AddressLine1: new FormControl('', Validators.required),
       AddressLine2: new FormControl(''),
@@ -31,7 +29,6 @@ export class ProfilePage implements OnInit {
       LastName: new FormControl('', Validators.required),
       County: new FormControl('', Validators.required),
       Country: new FormControl('Ireland'),
-      // CourseID: new FormControl(''),
       MobileNumber: new FormControl('', Validators.required),
       EirCode: new FormControl('', Validators.required),
       DOB: new FormControl('', Validators.required),
@@ -43,21 +40,22 @@ export class ProfilePage implements OnInit {
         ])
       ),
     });
+
     this.getData('user').then((res) => {
       this.user = JSON.parse(res);
-      this.formData.patchValue({
+      this.formData.setValue({
         AddressLine1: this.user.AddressLine1,
         AddressLine2: this.user.AddressLine2,
         FirstName: this.user.FirstName,
         LastName: this.user.LastName,
         County: this.user.County,
+        Country: this.user.Country,
         Email: this.user.Email,
         MobileNumber: this.user.MobileNumber,
         EirCode: this.user.EirCode,
         DOB: this.user.DOB,
-        // CourseID: this.user.CourseID,
       });
-      // console.log(this.user);
+      console.log(this.user);
     });
   }
 
@@ -69,18 +67,20 @@ export class ProfilePage implements OnInit {
     this.isSubmitted = true;
     if (!this.formData.valid) {
       console.log('Please provide all the required values!');
-      console.log(this.formData.value);
       return false;
     } else {
       this.getData('userID').then((res) => {
         this.getData('role').then((role) => {
           console.log(this.formData.value);
-          this.http.put<User>(
-            // 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/' +
-            'http://localhost:5000/attendancetracker-a53a9/us-central1/api/students/1',
-            // res,
-            this.formData.value
-          );
+          this.http
+            .patch(
+              // `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/${res}`,
+              `http://localhost:5000/attendancetracker-a53a9/us-central1/api/${role}s/${res}`,
+              this.formData.value
+            )
+            .subscribe((res) => {
+              console.log(res);
+            });
         });
       });
     }
