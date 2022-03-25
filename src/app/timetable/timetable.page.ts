@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Storage } from '@capacitor/storage';
@@ -12,7 +12,7 @@ interface moduleList {
   templateUrl: 'timetable.page.html',
   styleUrls: ['timetable.page.scss'],
 })
-export class TimetablePage {
+export class TimetablePage implements OnInit {
   module_id;
   courseId;
   course;
@@ -22,7 +22,7 @@ export class TimetablePage {
   list: any[] = [];
 
   constructor(private http: HttpClient) {}
-  ngOnInit() {
+  ngOnInit(): void {
     this.getData('role').then((res) => {
       if (res == 'lecturer') {
         this.lecturer = true;
@@ -33,6 +33,18 @@ export class TimetablePage {
       }
     });
   }
+
+  // ngOnInIt() {
+  //   this.getData('role').then((res) => {
+  //     if (res == 'lecturer') {
+  //       this.lecturer = true;
+  //       this.getClasses();
+  //     } else if (res == 'student') {
+  //       this.lecturer = false;
+  //       this.getCourse();
+  //     }
+  //   });
+  // }
 
   doRefresh(event) {
     console.log('Begin async operation');
@@ -45,15 +57,15 @@ export class TimetablePage {
 
   getClasses() {
     let resJson;
-    let test = '';
+    let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
       for (let i = 0; i < resJson.module_id.length; i++) {
         let parseValue = parseInt(resJson.module_id[i]);
-        test += parseValue + ',';
+        text += parseValue + ',';
       }
       let data = {
-        test: test.substring(0, test.length - 1),
+        text: text.substring(0, text.length - 1),
       };
       this.http
         .post(
@@ -80,7 +92,7 @@ export class TimetablePage {
 
   getCourse() {
     let resJson;
-    let test = '';
+    let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
       console.log(resJson);
@@ -94,11 +106,11 @@ export class TimetablePage {
           this.course = data;
           for (let i = 0; i < this.course['moduleList'].length; i++) {
             let parseValue = parseInt(this.course['moduleList'][i]);
-            test += parseValue + ',';
+            text += parseValue + ',';
           }
 
           let postData = {
-            test: test.substring(0, test.length - 1),
+            text: text.substring(0, text.length - 1),
           };
           console.log(postData);
           this.http

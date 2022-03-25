@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { Storage } from '@capacitor/storage';
-import { ModalController } from '@ionic/angular';
+import { LoadingController, ModalController } from '@ionic/angular';
 import { UpdateTimetableModalComponent } from '../update-timetable-modal/update-timetable-modal.component';
 
 interface moduleList {
@@ -15,26 +15,29 @@ interface moduleList {
 })
 export class ModifyTimetablePage implements OnInit {
   list: any[] = [];
+  private loading;
+
   constructor(
     private http: HttpClient,
-    public modalController: ModalController
+    public modalController: ModalController,
+    private loadingController: LoadingController
   ) {}
 
-  ngOnInit() {
-    this.getClasses();
+  ngOnInit(): void {
+    this.load();
   }
 
   getClasses() {
     let resJson;
-    let test = '';
+    let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
       for (let i = 0; i < resJson.module_id.length; i++) {
         let parseValue = parseInt(resJson.module_id[i]);
-        test += parseValue + ',';
+        text += parseValue + ',';
       }
       let data = {
-        test: test.substring(0, test.length - 1),
+        text: text.substring(0, text.length - 1),
       };
       this.http
         .post(
@@ -53,6 +56,7 @@ export class ModifyTimetablePage implements OnInit {
               });
           }
           this.list.push(data);
+          this.loading.dismiss();
           console.log(this.list);
         });
     });
@@ -62,7 +66,6 @@ export class ModifyTimetablePage implements OnInit {
   async openModal() {
     const modal = await this.modalController.create({
       component: UpdateTimetableModalComponent,
-      // cssClass: 'my-custom-class',
     });
     return await modal.present();
   }
@@ -72,5 +75,15 @@ export class ModifyTimetablePage implements OnInit {
     return value;
   }
 
-  deleteConfirm() {}
+  load() {
+    this.loadingController
+      .create({
+        message: 'Loading Data....',
+      })
+      .then((overlay) => {
+        this.loading = overlay;
+        this.loading.present();
+      });
+    this.getClasses();
+  }
 }

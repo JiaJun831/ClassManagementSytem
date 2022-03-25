@@ -19,7 +19,7 @@ export class SettingPage {
   }
 
   logout() {
-    this.router.navigate(['../login']);
+    this.router.navigate(['../login'], { replaceUrl: true });
     Storage.remove({ key: 'user' });
     Storage.remove({ key: 'role' });
     Storage.remove({ key: 'userID' });

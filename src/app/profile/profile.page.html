@@ -38,6 +38,7 @@
       <ion-item lines="full">
         <ion-label position="stacked">DOB</ion-label>
         <ion-input type="date" formControlName="DOB" required></ion-input>
+        <!-- <ion-datetime displayFormat="DD/MM/YYYY" presentation="date" formControlName="DOB" required></ion-datetime> -->
       </ion-item>
       <span class="error ion-padding" *ngIf=" isSubmitted  && errorControl.DOB.errors?.['required']">
         DOB is required.

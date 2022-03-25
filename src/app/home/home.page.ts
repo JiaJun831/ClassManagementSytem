@@ -9,12 +9,8 @@ import {
   PushNotifications,
   Token,
 } from '@capacitor/push-notifications';
-
 import { FCM } from '@capacitor-community/fcm';
-
-interface moduleList {
-  list: Array<any>;
-}
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-home',
@@ -26,31 +22,27 @@ export class HomePage implements OnInit {
   today: Date;
   time: any;
   course;
-  result = new Map();
   day: any;
   list: any[] = [];
-  module_id: any;
   lecturer: boolean;
-  constructor(private http: HttpClient) {}
+  private loading;
+  numOfClass = 0;
+  finish = 0;
+
+  constructor(
+    private http: HttpClient,
+    private loadingController: LoadingController
+  ) {}
 
   openBrowser() {
     Browser.open({ url: 'https://www.dkit.ie/' });
   }
 
+  ionViewDidEnter() {}
+
   ngOnInit() {
-    this.getData('role').then((res) => {
-      if (res == 'lecturer') {
-        this.lecturer = true;
-        this.getCourse();
-      } else {
-        this.lecturer = false;
-        this.getCourse();
-      }
-    });
-    this.getData('user').then((res) => {
-      let resJson = JSON.parse(res);
-      this.firstName = resJson.FirstName;
-    });
+    this.presentLoadingWithOptions();
+
     setInterval(() => {
       this.time = this.getCurrentTime();
     }, 1000);
@@ -145,10 +137,9 @@ export class HomePage implements OnInit {
 
   getCourse() {
     let resJson;
-    let test = '';
+    let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
-      console.log(resJson);
       this.getData('role').then((resp) => {
         if (resp == 'student') {
           this.http
@@ -157,15 +148,14 @@ export class HomePage implements OnInit {
                 resJson.CourseID
             )
             .subscribe((data) => {
-              console.log(data);
               this.course = data;
               for (let i = 0; i < this.course['moduleList'].length; i++) {
                 let parseValue = parseInt(this.course['moduleList'][i]);
-                test += parseValue + ',';
+                text += parseValue + ',';
               }
 
               let postData = {
-                test: test.substring(0, test.length - 1),
+                text: text.substring(0, text.length - 1),
               };
               this.http
                 .post(
@@ -184,17 +174,18 @@ export class HomePage implements OnInit {
                       });
                   }
                   this.list.push(data);
-                  console.log(this.list);
+                  this.loading.dismiss();
+                  this.checkTodayClass();
                 });
             });
           return this.list;
         } else if (resp == 'lecturer') {
           for (let i = 0; i < resJson.module_id.length; i++) {
             let parseValue = parseInt(resJson.module_id[i]);
-            test += parseValue + ',';
+            text += parseValue + ',';
           }
           let data = {
-            test: test.substring(0, test.length - 1),
+            text: text.substring(0, text.length - 1),
           };
           this.http
             .post(
@@ -213,7 +204,9 @@ export class HomePage implements OnInit {
                   });
               }
               this.list.push(data);
-              console.log(this.list);
+              this.loading.dismiss();
+
+              this.checkTodayClass();
             });
           return this.list;
         }
@@ -228,6 +221,49 @@ export class HomePage implements OnInit {
   isArray(val: string | any[]): boolean {
     if (val.length > 1) {
       return true;
+    }
+  }
+
+  presentLoadingWithOptions() {
+    this.loadingController
+      .create({
+        message: 'Please wait...',
+        animated: true,
+        keyboardClose: true,
+        spinner: 'bubbles',
+        duration: 2000,
+      })
+      .then((overlay) => {
+        this.loading = overlay;
+        this.loading.present();
+      });
+
+    this.getCourse();
+    this.getData('role').then((res) => {
+      if (res == 'lecturer') {
+        this.lecturer = true;
+      } else {
+        this.lecturer = false;
+      }
+    });
+
+    this.getData('user').then((res) => {
+      let resJson = JSON.parse(res);
+      this.firstName = resJson.FirstName;
+    });
+  }
+
+  checkTodayClass() {
+    // for (let i = 0; i < this.list.length; i++) {
+    for (const data of this.list) {
+      for (const test of data) {
+        if (test.data.timeslot.dayIndex == this.getToday()) {
+          this.numOfClass++;
+          if (test.data.timeslot.start_time.substring(0, 2) < this.time) {
+            this.finish++;
+          }
+        }
+      }
     }
   }
 }

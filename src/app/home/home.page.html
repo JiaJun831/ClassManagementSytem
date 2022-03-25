@@ -30,23 +30,31 @@
 
     <div class="ml">
       <h3>Schedule</h3>
-
       <div *ngFor="let listContent of list">
         <div *ngFor="let ts of listContent">
-          <span *ngIf="ts.data.timeslot.dayIndex == getToday()">
-            <ng-template [ngIf]="ts.data.timeslot.start_time.substring(0,2) >= time" [ngIfElse]="empty">
-              <p>{{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
-                <small>
-                  {{ts.data.timeslot.classroom}}</small>
-              </p>
-              <p>{{ts.data.module_name}}</p>
+          <ng-template [ngIf]="ts.data.timeslot.dayIndex == getToday()">
+            <ng-template [ngIf]="ts.data.timeslot.start_time.substring(0,2) >= time">
+              <ng-template>
+                <p>
+                  {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+                  <small>
+                    {{ts.data.timeslot.classroom}}</small>
+                </p>
+                <p>{{ts.data.module_name}}</p>
+              </ng-template>
             </ng-template>
-          </span>
+          </ng-template>
         </div>
       </div>
-      <ng-template #empty>
-        <p>You have all done for today!! Great!!</p>
-      </ng-template>
+
     </div>
+    <ng-template [ngIf]="finish == numOfClass && numOfClass != 0">
+      <p>Class Finish for today.</p>
+    </ng-template>
+
+    <ng-template [ngIf]="numOfClass == 0">
+      <p>You have no class for today!</p>
+    </ng-template>
   </div>
+
 </ion-content>
