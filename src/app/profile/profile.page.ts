@@ -74,8 +74,8 @@ export class ProfilePage implements OnInit {
           console.log(this.formData.value);
           this.http
             .patch(
-              // `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/${res}`,
-              `http://localhost:5000/attendancetracker-a53a9/us-central1/api/${role}s/${res}`,
+              `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/${res}`,
+              // `http://localhost:5000/attendancetracker-a53a9/us-central1/api/${role}s/${res}`,
               this.formData.value
             )
             .subscribe((res) => {

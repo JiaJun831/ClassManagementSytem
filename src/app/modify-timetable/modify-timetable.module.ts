@@ -16,7 +16,8 @@ import { UpdateTimetableModalComponent } from '../update-timetable-modal/update-
     IonicModule,
     ModifyTimetablePageRoutingModule,
   ],
-  declarations: [ModifyTimetablePage, UpdateTimetableModalComponent],
-  entryComponents: [UpdateTimetableModalComponent],
+  declarations: [ModifyTimetablePage],
+  // declarations: [ModifyTimetablePage, UpdateTimetableModalComponent],
+  // entryComponents: [UpdateTimetableModalComponent],
 })
 export class ModifyTimetablePageModule {}

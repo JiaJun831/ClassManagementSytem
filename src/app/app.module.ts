@@ -8,8 +8,9 @@ import { AppComponent } from './app.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
+import { UpdateTimetableModalComponent } from './update-timetable-modal/update-timetable-modal.component';
 @NgModule({
-  declarations: [AppComponent],
+  declarations: [AppComponent, UpdateTimetableModalComponent],
   entryComponents: [],
   imports: [
     BrowserModule,

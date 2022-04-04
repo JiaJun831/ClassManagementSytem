@@ -174,8 +174,8 @@ export class HomePage implements OnInit {
                       });
                   }
                   this.list.push(data);
-                  this.loading.dismiss();
                   this.checkTodayClass();
+                  this.loading.dismiss();
                 });
             });
           return this.list;
@@ -204,9 +204,8 @@ export class HomePage implements OnInit {
                   });
               }
               this.list.push(data);
-              this.loading.dismiss();
-
               this.checkTodayClass();
+              this.loading.dismiss();
             });
           return this.list;
         }
@@ -231,14 +230,12 @@ export class HomePage implements OnInit {
         animated: true,
         keyboardClose: true,
         spinner: 'bubbles',
-        duration: 2000,
+        // duration: 2000,
       })
       .then((overlay) => {
         this.loading = overlay;
         this.loading.present();
       });
-
-    this.getCourse();
     this.getData('role').then((res) => {
       if (res == 'lecturer') {
         this.lecturer = true;
@@ -251,10 +248,10 @@ export class HomePage implements OnInit {
       let resJson = JSON.parse(res);
       this.firstName = resJson.FirstName;
     });
+    this.getCourse();
   }
 
   checkTodayClass() {
-    // for (let i = 0; i < this.list.length; i++) {
     for (const data of this.list) {
       for (const test of data) {
         if (test.data.timeslot.dayIndex == this.getToday()) {

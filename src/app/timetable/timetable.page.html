@@ -22,7 +22,7 @@
       </ion-fab-list>
     </ion-fab>
     <ion-list>
-      <ion-row>
+      <ion-row class="ion-align-items-center ion-justify-content-center">
         <ion-col size="2">
           <p>Day</p>
         </ion-col>
@@ -41,17 +41,21 @@
     <div *ngFor="let listContent of list">
       <div *ngFor="let ts of listContent">
         <ion-list>
-          <ion-row>
+          <ion-row class="ion-align-items-center ion-justify-content-center">
             <ion-col size="2">
               <p>{{ts.data.timeslot.day.slice(0,3)}}</p>
             </ion-col>
             <ion-col size="2">
-              <p> {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }}
+              <!-- <p> {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }} -->
+              <p>
+                {{ts.data.timeslot.start_time}}
               </p>
             </ion-col>
             <ion-col size="2">
-              <p>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}</p>
-
+              <!-- <p>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}</p> -->
+              <p>
+                {{ts.data.timeslot.end_time}}
+              </p>
             </ion-col>
             <ion-col size="5">
               <p>{{ts.data.module_name}}<br><small>{{ts.data.timeslot.classroom}}</small></p>

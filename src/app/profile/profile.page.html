@@ -11,9 +11,11 @@
 <ion-content>
   <div class="container">
     <form [formGroup]="formData" novalidate>
-      <ion-avatar class="avatar">
+      <app-photo-upload></app-photo-upload>
+
+      <!-- <ion-avatar class="avatar">
         <img src="../../assets/profile1.jfif" alt="">
-      </ion-avatar>
+      </ion-avatar> -->
       <ion-item lines="full">
         <ion-label position="floating">First Name</ion-label>
         <ion-input type="text" formControlName="FirstName" required></ion-input>

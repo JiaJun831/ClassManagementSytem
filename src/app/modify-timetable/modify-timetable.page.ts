@@ -24,12 +24,20 @@ export class ModifyTimetablePage implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.load();
+    const today = new Date();
+    const lastSunday = today.getDate() - today.getDay();
+    const sunday = new Date(today.setDate(lastSunday)).toJSON();
+    const dateOnly = sunday.split('T');
+    const date = dateOnly[0];
+
+    this.load(date);
   }
 
-  getClasses() {
+  getClasses(date: String) {
     let resJson;
     let text = '';
+    let classList = [];
+    let timetableList = [];
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
       for (let i = 0; i < resJson.module_id.length; i++) {
@@ -40,22 +48,45 @@ export class ModifyTimetablePage implements OnInit {
         text: text.substring(0, text.length - 1),
       };
       this.http
+        .get(
+          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+            date
+        )
+        .subscribe((res) => {
+          res['timetable'].forEach((result) => {
+            if (result.active == true) {
+              timetableList.push(result);
+            }
+          });
+        });
+
+      this.http
         .post(
           'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
           data
         )
         .subscribe((data) => {
-          for (let i = 0; i < Object.keys(data).length; i++) {
+          for (let j = 0; j < timetableList.length; j++) {
+            if (timetableList[j].active != false) {
+              for (let i = 0; i < Object.keys(data).length; i++) {
+                if (timetableList[j].class_id == data[i].id) {
+                  classList.push(data[i]);
+                }
+              }
+            }
+          }
+          for (let i = 0; i < classList.length; i++) {
             this.http
               .get(
                 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                  data[i].data.module_id
+                  classList[i].data.module_id
               )
               .subscribe((res) => {
-                data[i].data.module_name = res['Name'];
+                classList[i].data.module_name = res['Name'];
               });
           }
-          this.list.push(data);
+          this.list.push(classList);
+
           this.loading.dismiss();
           console.log(this.list);
         });
@@ -63,10 +94,15 @@ export class ModifyTimetablePage implements OnInit {
     return this.list;
   }
 
-  async openModal() {
+  async openModal(class_id: number, module_id: number) {
     const modal = await this.modalController.create({
       component: UpdateTimetableModalComponent,
+      componentProps: {
+        class_id: class_id,
+        module_id: module_id,
+      },
     });
+
     return await modal.present();
   }
 
@@ -75,7 +111,7 @@ export class ModifyTimetablePage implements OnInit {
     return value;
   }
 
-  load() {
+  load(date: String) {
     this.loadingController
       .create({
         message: 'Loading Data....',
@@ -84,6 +120,6 @@ export class ModifyTimetablePage implements OnInit {
         this.loading = overlay;
         this.loading.present();
       });
-    this.getClasses();
+    this.getClasses(date);
   }
 }

@@ -2,5 +2,12 @@
 	"appId": "io.ionic.starter",
 	"appName": "Class Management System",
 	"webDir": "www",
-	"bundledWebRuntime": false
+	"bundledWebRuntime": false,
+	"PushNotifications": {
+		"presentationOptions": [
+			"badge",
+			"sound",
+			"alert"
+		]
+	}
 }

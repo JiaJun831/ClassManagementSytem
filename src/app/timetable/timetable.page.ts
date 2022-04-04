@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Storage } from '@capacitor/storage';
+import { time } from 'console';
 
 interface moduleList {
   list: Array<any>;
@@ -23,28 +24,22 @@ export class TimetablePage implements OnInit {
 
   constructor(private http: HttpClient) {}
   ngOnInit(): void {
+    const today = new Date();
+    const lastSunday = today.getDate() - today.getDay();
+    const sunday = new Date(today.setDate(lastSunday)).toJSON();
+    const dateOnly = sunday.split('T');
+    const date = dateOnly[0];
+
     this.getData('role').then((res) => {
       if (res == 'lecturer') {
         this.lecturer = true;
-        this.getClasses();
+        this.getClasses(date);
       } else if (res == 'student') {
         this.lecturer = false;
         this.getCourse();
       }
     });
   }
-
-  // ngOnInIt() {
-  //   this.getData('role').then((res) => {
-  //     if (res == 'lecturer') {
-  //       this.lecturer = true;
-  //       this.getClasses();
-  //     } else if (res == 'student') {
-  //       this.lecturer = false;
-  //       this.getCourse();
-  //     }
-  //   });
-  // }
 
   doRefresh(event) {
     console.log('Begin async operation');
@@ -55,9 +50,11 @@ export class TimetablePage implements OnInit {
     }, 2000);
   }
 
-  getClasses() {
+  getClasses(date: String) {
     let resJson;
     let text = '';
+    let classList = [];
+    let timetableList = [];
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
       for (let i = 0; i < resJson.module_id.length; i++) {
@@ -67,23 +64,46 @@ export class TimetablePage implements OnInit {
       let data = {
         text: text.substring(0, text.length - 1),
       };
+      console.log(data);
+      this.http
+        .get(
+          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+            date
+        )
+        .subscribe((res) => {
+          res['timetable'].forEach((result) => {
+            if (result.active == true) {
+              timetableList.push(result);
+            }
+          });
+        });
+      // console.log(timetableList);
       this.http
         .post(
           'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
           data
         )
         .subscribe((data) => {
-          for (let i = 0; i < Object.keys(data).length; i++) {
+          console.log(data);
+          for (let j = 0; j < timetableList.length; j++) {
+            for (let i = 0; i < Object.keys(data).length; i++) {
+              if (timetableList[j].class_id == data[i].id) {
+                console.log(data[i]);
+                classList.push(data[i]);
+              }
+            }
+          }
+          for (let i = 0; i < classList.length; i++) {
             this.http
               .get(
                 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                  data[i].data.module_id
+                  classList[i].data.module_id
               )
               .subscribe((res) => {
-                data[i].data.module_name = res['Name'];
+                classList[i].data.module_name = res['Name'];
               });
           }
-          this.list.push(data);
+          this.list.push(classList);
           console.log(this.list);
         });
     });
