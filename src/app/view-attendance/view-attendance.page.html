@@ -1,9 +1,25 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Attendance</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
+  <div id="studentList" *ngFor="let sl of studentList | keyvalue">
+    <ion-row class="ion-align-items-center ion-justify-content-center">
+      <ion-col size="10">
+        <p>{{sl.value.FirstName + ' ' + sl.value.LastName}}</p>
+        <p>{{sl.value.Email}}</p>
+      </ion-col>
+      <ion-col size="2">
+        <ion-button size="small">
+          <ion-icon slot="icon-only" name="barcode-outline"></ion-icon>
+        </ion-button>
+      </ion-col>
+    </ion-row>
 
+  </div>
 </ion-content>

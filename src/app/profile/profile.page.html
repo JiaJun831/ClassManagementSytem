@@ -1,81 +1,89 @@
 <ion-header>
   <ion-toolbar>
     <ion-title>Profile</ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
 
 <ion-content>
-  <form [formGroup]="formData" novalidate>
-    <ion-avatar class="avatar">
-      <img src="../../assets/profile1.jfif" alt="">
-    </ion-avatar>
-    <ion-item lines="full">
-      <ion-label position="floating">First Name</ion-label>
-      <ion-input type="text" formControlName="FirstName" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.FirstName.errors?.required">
-      First Name is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">Last Name</ion-label>
-      <ion-input type="text" formControlName="LastName" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.LastName.errors?.required">
-      Last Name is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">Email</ion-label>
-      <ion-input type="email" formControlName="Email" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.Email.errors?.required">
-      Email Address is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="stacked">DOB</ion-label>
-      <ion-input type="date" formControlName="DOB" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.DOB.errors?.required">
-      DOB is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">Mobile</ion-label>
-      <ion-input type="text" formControlName="MobileNumber" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.MobileNumber.errors?.required">
-      Mobile Number is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">Address Line 1</ion-label>
-      <ion-input type="text" formControlName="AddressLine1" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.AddressLine1.errors?.required">
-      Address Line 1 is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">Address Line 2</ion-label>
-      <ion-input type="text" formControlName="AddressLine2" required></ion-input>
-    </ion-item>
-    <ion-item lines="full">
-      <ion-label position="floating">County</ion-label>
-      <ion-input type="text" formControlName="County" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.County.errors?.required">
-      County is required.
-    </span>
-    <ion-item lines="full">
-      <ion-label position="floating">EirCode</ion-label>
-      <ion-input type="text" formControlName="EirCode" required></ion-input>
-    </ion-item>
-    <span class="error ion-padding" *ngIf="isSubmitted && errorControl.EirCode.errors?.required">
-      EirCode is required.
-    </span>
-    <ion-input type="hidden" formControlName="Country"></ion-input>
-    <ion-row>
-      <ion-col>
-        <ion-button type="submit" color="danger" expand="block" (click)="updateStudent()">
-          Submit</ion-button>
-      </ion-col>
-    </ion-row>
-  </form>
+  <div class="container">
+    <form [formGroup]="formData" novalidate>
+      <app-photo-upload></app-photo-upload>
+
+      <!-- <ion-avatar class="avatar">
+        <img src="../../assets/profile1.jfif" alt="">
+      </ion-avatar> -->
+      <ion-item lines="full">
+        <ion-label position="floating">First Name</ion-label>
+        <ion-input type="text" formControlName="FirstName" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.FirstName.errors?.['required']">
+        First Name is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">Last Name</ion-label>
+        <ion-input type="text" formControlName="LastName" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.LastName.errors?.['required']">
+        Last Name is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">Email</ion-label>
+        <ion-input type="email" formControlName="Email" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.Email.errors?.['required']">
+        Email Address is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="stacked">DOB</ion-label>
+        <ion-input type="date" formControlName="DOB" required></ion-input>
+        <!-- <ion-datetime displayFormat="DD/MM/YYYY" presentation="date" formControlName="DOB" required></ion-datetime> -->
+      </ion-item>
+      <span class="error ion-padding" *ngIf=" isSubmitted  && errorControl.DOB.errors?.['required']">
+        DOB is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">Mobile</ion-label>
+        <ion-input type="text" formControlName="MobileNumber" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.MobileNumber.errors?.['required']">
+        Mobile Number is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">Address Line 1</ion-label>
+        <ion-input type="text" formControlName="AddressLine1" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.AddressLine1.errors?.['required']">
+        Address Line 1 is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">Address Line 2</ion-label>
+        <ion-input type="text" formControlName="AddressLine2"></ion-input>
+      </ion-item>
+      <ion-item lines="full">
+        <ion-label position="floating">County</ion-label>
+        <ion-input type="text" formControlName="County" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.County.errors?.['required']">
+        County is required.
+      </span>
+      <ion-item lines="full">
+        <ion-label position="floating">EirCode</ion-label>
+        <ion-input type="text" formControlName="EirCode" required></ion-input>
+      </ion-item>
+      <span class="error ion-padding" *ngIf="isSubmitted && errorControl.EirCode.errors?.['required']">
+        EirCode is required.
+      </span>
+      <ion-input type="hidden" formControlName="Country"></ion-input>
+      <ion-row>
+        <ion-col>
+          <ion-button type="submit" color="danger" expand="block" (click)="updateProfile()">
+            Submit</ion-button>
+        </ion-col>
+      </ion-row>
+    </form>
+  </div>
 </ion-content>

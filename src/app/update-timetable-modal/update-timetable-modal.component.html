@@ -1,0 +1,51 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title></ion-title>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">Cancel</ion-button>
+    </ion-buttons>
+    <ion-buttons slot="end">
+      <ion-button (click)="presentAlertRadio()">Apply</ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="updateForm" novalidate>
+
+    <div class="container">
+      <ion-item>
+        <ion-label>Day</ion-label>
+        <ion-select formControlName="dayIndex" interface="popover">
+          <ion-select-option value="1">Monday</ion-select-option>
+          <ion-select-option value="2">Tuesday</ion-select-option>
+          <ion-select-option value="3">Wednesday</ion-select-option>
+          <ion-select-option value="4">Thursday</ion-select-option>
+          <ion-select-option value="5">Friday</ion-select-option>
+        </ion-select>
+      </ion-item>
+    </div>
+    <div class="center">
+      <p>Start Time</p>
+    </div>
+    <div>
+      <ion-datetime formControlName="start_time" presentation="time" hourValues="[9,10,11,12,13,14,15,16]" size="cover"
+        hourCycle="h23" minuteValues="0">
+      </ion-datetime>
+    </div>
+    <div class="center">
+      <p>End Time</p>
+    </div>
+    <div>
+      <ion-datetime formControlName="end_time" presentation="time" hourValues="[10,11,12,13,14,15,16,17]" size="cover"
+        hourCycle="h23" minuteValues="0">
+      </ion-datetime>
+    </div>
+    <div>
+      <ion-item lines="full">
+        <ion-label position="floating">Classroom</ion-label>
+        <ion-input formControlName="classroom" type="text" required></ion-input>
+      </ion-item>
+    </div>
+  </form>
+</ion-content>

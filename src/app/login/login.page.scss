@@ -1,19 +1,17 @@
-// #login {
-//     --ion-background-color: #111d12;
-
-//     // background: #bb86fc;x
-// }
-
-ion-button {
-    --background: #60c689;
-    --border-radius: 10px 50px 10px 50px;
-}
-
 ion-content {
     --padding-top: 10px;
     --padding-bottom: 10px;
     --padding-start: 20px;
     --padding-end: 20px;
+}
+
+#log-text {
+    text-align: center;
+}
+
+ion-button {
+    --background: #60c689;
+    --border-radius: 10px 50px 10px 50px;
 }
 
 form {
@@ -22,14 +20,9 @@ form {
     padding: 20px 5px 25px 5px;
     background-color: white;
 }
-
 ion-item {
     --background: white;
     --color: black;
     border-radius: 15%;
     // border-radius: 35px 10px 35px 10px;
-}
-
-#log-text {
-    text-align: center;
 }

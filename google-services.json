@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "369914266718",
+    "project_id": "attendancetracker-a53a9",
+    "storage_bucket": "attendancetracker-a53a9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:369914266718:android:ffb55b29e83daca97260cf",
+        "android_client_info": {
+          "package_name": "io.ionic.starter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "369914266718-11lh4dgle7f4i92lcls4o846rd2vdbmp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDXN1d9S6FHkaO-GG6Gpz6Jo290-u-Uyu4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "369914266718-11lh4dgle7f4i92lcls4o846rd2vdbmp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,4 +1,4 @@
-<ion-header [translucent]="true">
+<ion-header>
   <ion-toolbar>
     <ion-title>
       Home
@@ -6,33 +6,54 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button fab-icon>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="top">
-      <button>
-        <div class="fab-label fab-label-att" [routerLink]="['/view-attendance']">View Attendance</div>
-      </button>
-    </ion-fab-list>
-  </ion-fab>
+<ion-content>
+  <div class="container">
+    <ion-fab vertical="bottom" horizontal="end" slot="fixed" *ngIf="lecturer">
+      <ion-fab-button fab-icon>
+        <ion-icon name="add"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="top">
+        <button class="fab-button">
+          <div class="fab-label fab-label-att" [routerLink]="['/view-attendance']">View Attendance</div>
+        </button>
+      </ion-fab-list>
+    </ion-fab>
 
-  <div class="text-center font-md pb-3">
-    <ion-text>Welcome</ion-text>
-  </div>
-  <div>
+    <div class="text-center">
+      <p>Welcome {{firstName}}</p>
+    </div>
 
-  </div>
-  <div>
-    <!-- <ion-item-divider class="text-center"> -->
-    <ion-label id="link" (click)="openBrowser()">Visit DKIT</ion-label>
-    <ion-img id="campus" src="../../assets/campus.png"></ion-img>
+    <div>
+      <ion-label id="link" (click)="openBrowser()">Visit DKIT</ion-label>
+      <ion-img id="campus" src="../../assets/campus.png"></ion-img>
+    </div>
 
-    <!-- </ion-item-divider> -->
+    <div>
+      <h3 class="ion-margin-start">Schedule</h3>
+      <div *ngFor="let listContent of list">
+        <div *ngFor="let ts of listContent">
+          <ng-template [ngIf]="ts.data.timeslot.dayIndex == getToday()">
+            <ng-template [ngIf]="ts.data.timeslot.start_time.substring(0,2) >= time">
+              <p>
+                {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }} -
+                {{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}
+                <small>
+                  {{ts.data.timeslot.classroom}}</small>
+              </p>
+              <p>{{ts.data.module_name}}</p>
+            </ng-template>
+          </ng-template>
+        </div>
+      </div>
 
+    </div>
+    <ng-template [ngIf]="finish == numOfClass && numOfClass != 0">
+      <p class="ion-margin-start">Class Finish for today.</p>
+    </ng-template>
 
-
+    <ng-template [ngIf]="numOfClass == 0">
+      <p class="ion-margin-start">You have no class for today!</p>
+    </ng-template>
   </div>
 
 </ion-content>

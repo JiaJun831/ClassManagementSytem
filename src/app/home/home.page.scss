@@ -1,9 +1,3 @@
-[fab-icon] {
-    --background: #60c689;
-    --background-focused: #32313b;
-    --background-activated: #32313b;
-}
-
 #link {
     position: absolute;
     top: 20%; // change this when the page redesign
@@ -27,14 +21,6 @@ a {
 
 .text-center {
     text-align: center;
-}
-
-.font-md {
-    font-size: 20px;
-}
-
-.pb-3 {
-    padding-bottom: 7.5px;
 }
 
 .font-white {
@@ -63,4 +49,18 @@ a {
 
 button {
     padding: 0;
+}
+
+ion-fab-button {
+    // margin-bottom: 55px;
+}
+
+.fab-button {
+    // margin-bottom: 50px;
+}
+
+[fab-icon] {
+    --background: #60c689;
+    --background-focused: #32313b;
+    --background-activated: #32313b;
 }

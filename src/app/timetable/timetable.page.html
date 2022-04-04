@@ -7,26 +7,63 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
+  <ion-refresher slot="fixed" (ionRefresh)="doRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  <div class="container">
+    <ion-fab *ngIf="lecturer" vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button fab-icon>
+        <ion-icon name="pencil-outline"></ion-icon>
+      </ion-fab-button>
+      <ion-fab-list side="top">
+        <button class="fab-button">
+          <div class="fab-label fab-label-att" [routerLink]="['/modify-timetable']">Modify Timetable</div>
+        </button>
+      </ion-fab-list>
+    </ion-fab>
+    <ion-list>
+      <ion-row class="ion-align-items-center ion-justify-content-center">
+        <ion-col size="2">
+          <p>Day</p>
+        </ion-col>
+        <ion-col size="2">
+          <p>From</p>
+        </ion-col>
+        <ion-col size="2">
+          <p>To</p>
+        </ion-col>
+        <ion-col size="5">
+          <p>Module</p>
+        </ion-col>
 
-  <!-- <ion-col *ngFor="let test of movieList">
-    <p>{{test.id}}</p>
-    <p>{{test.classes}}</p>
-    <ion-col *ngFor="let class of test.classes">
-      <p>{{class.timeslots}}</p>
-      <ion-col *ngFor="let times of class.timeslots">
-        <p>{{times}}</p>
-      </ion-col>
+      </ion-row>
+    </ion-list>
+    <div *ngFor="let listContent of list">
+      <div *ngFor="let ts of listContent">
+        <ion-list>
+          <ion-row class="ion-align-items-center ion-justify-content-center">
+            <ion-col size="2">
+              <p>{{ts.data.timeslot.day.slice(0,3)}}</p>
+            </ion-col>
+            <ion-col size="2">
+              <!-- <p> {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }} -->
+              <p>
+                {{ts.data.timeslot.start_time}}
+              </p>
+            </ion-col>
+            <ion-col size="2">
+              <!-- <p>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}</p> -->
+              <p>
+                {{ts.data.timeslot.end_time}}
+              </p>
+            </ion-col>
+            <ion-col size="5">
+              <p>{{ts.data.module_name}}<br><small>{{ts.data.timeslot.classroom}}</small></p>
+            </ion-col>
+          </ion-row>
+        </ion-list>
 
-    </ion-col>
-  </ion-col> -->
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button fab-icon>
-      <ion-icon name="add"></ion-icon>
-    </ion-fab-button>
-    <ion-fab-list side="top">
-      <button>
-        <div class="fab-label fab-label-att" [routerLink]="['/modify-timetable']">Modify Timetable</div>
-      </button>
-    </ion-fab-list>
-  </ion-fab>
+      </div>
+    </div>
+  </div>
 </ion-content>

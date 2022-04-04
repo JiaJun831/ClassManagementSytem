@@ -1,9 +1,65 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar>
-    <ion-title>Modify Timetable</ion-title>
+    <ion-title>
+      Modify Timetable
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button></ion-back-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
+  <div class="container">
+    <ion-list>
+      <ion-row class="ion-align-items-center ion-justify-content-center">
+        <ion-col size="2">
+          <p>Day</p>
+        </ion-col>
+        <ion-col size="2">
+          <p>From</p>
+        </ion-col>
+        <ion-col size="2">
+          <p>To</p>
+        </ion-col>
+        <ion-col size="5">
+          <p>Module</p>
+        </ion-col>
+        <ion-col size="1"></ion-col>
+      </ion-row>
+    </ion-list>
+    <div *ngFor="let listContent of list">
+      <div *ngFor="let ts of listContent">
+        <ion-list>
+          <ion-row class="ion-align-items-center ion-justify-content-center">
+            <ion-col size="2">
+              <p>{{ts.data.timeslot.day.slice(0,3)}}</p>
+            </ion-col>
+            <ion-col size="2">
+              <!-- <p> {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }} -->
+              <p>
+                {{ts.data.timeslot.start_time}}
+              </p>
+            </ion-col>
+            <ion-col size="2">
+              <!-- <p>{{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }}</p> -->
+              <p>
+                {{ts.data.timeslot.end_time}}
+              </p>
+            </ion-col>
+            <ion-col size="5">
+              <p>{{ts.data.module_name}}<br><small>{{ts.data.timeslot.classroom}}</small></p>
+            </ion-col>
+            <ion-col size="1">
+              <p>
+                <ion-icon (click)="openModal(ts.id,ts.data.module_id)" name="pencil-sharp"></ion-icon>
+              </p>
+            </ion-col>
+          </ion-row>
+        </ion-list>
+      </div>
+    </div>
+  </div>
+
 
 </ion-content>
