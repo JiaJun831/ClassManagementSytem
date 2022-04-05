@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { Storage } from '@capacitor/storage';
+import { AlertController } from '@ionic/angular';
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.page.html',
@@ -16,7 +17,8 @@ export class ProfilePage implements OnInit {
 
   constructor(
     private http: HttpClient,
-    private activatedRoute: ActivatedRoute
+    private activatedRoute: ActivatedRoute,
+    private alertController: AlertController
   ) {}
 
   ngOnInit() {
@@ -55,7 +57,6 @@ export class ProfilePage implements OnInit {
         EirCode: this.user.EirCode,
         DOB: this.user.DOB,
       });
-      console.log(this.user);
     });
   }
 
@@ -66,21 +67,25 @@ export class ProfilePage implements OnInit {
   updateProfile() {
     this.isSubmitted = true;
     if (!this.formData.valid) {
-      console.log('Please provide all the required values!');
+      const alert = this.alertController.create({
+        header: 'Please provide all the required values!',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'cancel',
+          },
+        ],
+      });
       return false;
     } else {
       this.getData('userID').then((res) => {
         this.getData('role').then((role) => {
-          console.log(this.formData.value);
           this.http
             .patch(
               `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/${res}`,
-              // `http://localhost:5000/attendancetracker-a53a9/us-central1/api/${role}s/${res}`,
               this.formData.value
             )
-            .subscribe((res) => {
-              console.log(res);
-            });
+            .subscribe((res) => {});
         });
       });
     }
