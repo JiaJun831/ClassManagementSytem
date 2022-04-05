@@ -95,13 +95,16 @@ export class LoginPage implements OnInit {
 
   getSundayOfCurrentWeek() {
     const today = new Date();
-    const lastSunday = new Date(
-      today.setDate(today.getDate() - today.getDay())
+    // Get last sunday date
+    const lastSunday = today.getDate() - today.getDay();
+    let sunday = new Date(today.setDate(lastSunday));
+    // gettimezoneoffset
+    const final = sunday.setTime(
+      sunday.getTime() - new Date().getTimezoneOffset() * 60 * 1000
     );
-    const month = lastSunday.getMonth() + 1;
-    console.log(lastSunday.toDateString());
-    const lastSundayString =
-      lastSunday.getFullYear() + '-0' + month + '-' + lastSunday.getDate();
-    return lastSundayString;
+    const result = new Date(final).toJSON();
+    const dateOnly = result.split('T');
+    const date = dateOnly[0];
+    return date;
   }
 }

@@ -24,13 +24,9 @@ export class ModifyTimetablePage implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const today = new Date();
-    const lastSunday = today.getDate() - today.getDay();
-    const sunday = new Date(today.setDate(lastSunday)).toJSON();
-    const dateOnly = sunday.split('T');
-    const date = dateOnly[0];
-
-    this.load(date);
+    this.getData('timetableDate').then((date) => {
+      this.load(date);
+    });
   }
 
   getClasses(date: String) {
@@ -66,9 +62,9 @@ export class ModifyTimetablePage implements OnInit {
           data
         )
         .subscribe((data) => {
-          for (let j = 0; j < timetableList.length; j++) {
-            if (timetableList[j].active != false) {
-              for (let i = 0; i < Object.keys(data).length; i++) {
+          for (let i = 0; i < Object.keys(data).length; i++) {
+            for (let j = 0; j < timetableList.length; j++) {
+              if (timetableList[j].active != false) {
                 if (timetableList[j].class_id == data[i].id) {
                   classList.push(data[i]);
                 }
@@ -86,23 +82,26 @@ export class ModifyTimetablePage implements OnInit {
               });
           }
           this.list.push(classList);
-
           this.loading.dismiss();
-          console.log(this.list);
         });
     });
     return this.list;
   }
 
   async openModal(class_id: number, module_id: number) {
-    const modal = await this.modalController.create({
+    let modal = await this.modalController.create({
       component: UpdateTimetableModalComponent,
       componentProps: {
         class_id: class_id,
         module_id: module_id,
       },
     });
-
+    modal.onDidDismiss().then((res) => {
+      this.getData('timetableDate').then((date) => {
+        this.list = [];
+        this.load(date);
+      });
+    });
     return await modal.present();
   }
 

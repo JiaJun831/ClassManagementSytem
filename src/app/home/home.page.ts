@@ -73,7 +73,6 @@ export class HomePage implements OnInit {
 
       PushNotifications.addListener('registration', (token: Token) => {
         this.getData('userID').then((res) => {
-          console.log(res);
           let postData = {
             userID: res,
             token: token.value,
@@ -84,9 +83,7 @@ export class HomePage implements OnInit {
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/notificationToken',
               postData
             )
-            .subscribe((res) => {
-              console.log(res);
-            });
+            .subscribe((res) => {});
         });
       });
 
@@ -135,8 +132,11 @@ export class HomePage implements OnInit {
     return this.today.getDay();
   }
 
-  getCourse() {
+  getCourse(date: string) {
     let resJson;
+
+    let classList = [];
+    let timetableList = [];
     let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
@@ -188,22 +188,41 @@ export class HomePage implements OnInit {
             text: text.substring(0, text.length - 1),
           };
           this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+                date
+            )
+            .subscribe((res) => {
+              res['timetable'].forEach((result) => {
+                if (result.active == true) {
+                  timetableList.push(result);
+                }
+              });
+            });
+          this.http
             .post(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
               data
             )
             .subscribe((data) => {
               for (let i = 0; i < Object.keys(data).length; i++) {
+                for (let j = 0; j < timetableList.length; j++) {
+                  if (timetableList[j].class_id == data[i].id) {
+                    classList.push(data[i]);
+                  }
+                }
+              }
+              for (let i = 0; i < classList.length; i++) {
                 this.http
                   .get(
                     'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                      data[i].data.module_id
+                      classList[i].data.module_id
                   )
                   .subscribe((res) => {
-                    data[i].data.module_name = res['Name'];
+                    classList[i].data.module_name = res['Name'];
                   });
               }
-              this.list.push(data);
+              this.list.push(classList);
               this.checkTodayClass();
               this.loading.dismiss();
             });
@@ -248,7 +267,9 @@ export class HomePage implements OnInit {
       let resJson = JSON.parse(res);
       this.firstName = resJson.FirstName;
     });
-    this.getCourse();
+    this.getData('timetableDate').then((date) => {
+      this.getCourse(date);
+    });
   }
 
   checkTodayClass() {

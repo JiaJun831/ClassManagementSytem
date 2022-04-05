@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
+import { Storage } from '@capacitor/storage';
 
 @Component({
   selector: 'app-update-timetable-modal',
@@ -22,13 +23,11 @@ export class UpdateTimetableModalComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    console.log(this.class_id);
-    console.log(this.module_id);
     this.updateForm = new FormGroup({
       classroom: new FormControl('', Validators.required),
-      dayIndex: new FormControl('1'),
-      end_time: new FormControl('10:00', Validators.required),
-      start_time: new FormControl('09:00', Validators.required),
+      dayIndex: new FormControl(''),
+      end_time: new FormControl('', Validators.required),
+      start_time: new FormControl('', Validators.required),
       day: new FormControl(),
     });
   }
@@ -83,14 +82,20 @@ export class UpdateTimetableModalComponent implements OnInit {
   async updateClass(updateWeek: String) {
     this.isSubmitted = true;
     if (!this.updateForm.valid) {
-      console.log('Please provide all the required values!');
+      const alert = this.alertController.create({
+        header: 'Please provide all the required values!',
+        buttons: [
+          {
+            text: 'OK',
+            role: 'cancel',
+          },
+        ],
+      });
       return false;
     } else {
       const startTime = this.updateForm.value.start_time.split('T');
       const endTime = this.updateForm.value.end_time.split('T');
-      const startValue = startTime[1].substring(0, 5);
-      const endValue = endTime[1].substring(0, 5);
-      if (startValue > endValue) {
+      if (startTime > endTime) {
         const alert = await this.alertController.create({
           cssClass: 'my-custom-class',
           header:
@@ -103,46 +108,51 @@ export class UpdateTimetableModalComponent implements OnInit {
             },
           ],
         });
-        await alert.present();
       } else {
         const updateDate = {
           module_id: this.module_id,
           timeslot: {
-            start_time: startValue,
+            start_time: startTime,
             classroom: this.updateForm.value.classroom,
             dayIndex: parseInt(this.updateForm.value.dayIndex),
-            end_time: endValue,
+            end_time: endTime,
             day: this.day[this.updateForm.value.dayIndex - 1],
           },
         };
-        console.log(updateDate);
-        if (updateWeek == 'week') {
-          this.http
-            .post(
-              `https://us-entral1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${this.startOfTheWeek()}/${
-                this.class_id
-              }`,
+        this.getData('timetableDate').then((date) => {
+          if (updateWeek == 'week') {
+            this.http
+              .post(
+                `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
+                { newClass: updateDate }
+              )
+              .subscribe(async (res) => {
+                const alert = await this.alertController.create({
+                  header: 'Update Complete',
+                  buttons: [
+                    {
+                      text: 'Ok',
+                      role: 'cancel',
+                      handler: () => {
+                        this.dismissModal();
+                      },
+                    },
+                  ],
+                });
+                await alert.present();
+              });
+          } else {
+            this.http.post(
+              `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/default/${this.class_id}`,
               { newClass: updateDate }
-            )
-            .subscribe((res) => {
-              console.log(res);
-            });
-        } else {
-          this.http.post(
-            `https://us-entral1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/default/${this.class_id}`,
-            { newClass: updateDate }
-          );
-        }
+            );
+          }
+        });
       }
     }
   }
-
-  startOfTheWeek() {
-    const today = new Date();
-    const lastSunday = today.getDate() - today.getDay();
-    const sunday = new Date(today.setDate(lastSunday)).toJSON();
-    const dateOnly = sunday.split('T');
-    const date = dateOnly[0];
-    return date;
+  async getData(input: string) {
+    const { value } = await Storage.get({ key: input });
+    return value;
   }
 }
