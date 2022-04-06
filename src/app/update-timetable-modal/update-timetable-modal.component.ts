@@ -3,7 +3,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { AlertController, ModalController } from '@ionic/angular';
 import { Storage } from '@capacitor/storage';
-
 @Component({
   selector: 'app-update-timetable-modal',
   templateUrl: './update-timetable-modal.component.html',
@@ -25,17 +24,15 @@ export class UpdateTimetableModalComponent implements OnInit {
   ngOnInit() {
     this.updateForm = new FormGroup({
       classroom: new FormControl('', Validators.required),
-      dayIndex: new FormControl(''),
-      end_time: new FormControl('', Validators.required),
-      start_time: new FormControl('', Validators.required),
+      dayIndex: new FormControl('1'),
+      end_time: new FormControl('10:00', Validators.required),
+      start_time: new FormControl('09:00', Validators.required),
       day: new FormControl(),
     });
   }
-
   dismissModal() {
     this.modalController.dismiss();
   }
-
   async presentAlertRadio() {
     const alert = await this.alertController.create({
       cssClass: 'my-custom-class',
@@ -82,7 +79,7 @@ export class UpdateTimetableModalComponent implements OnInit {
   async updateClass(updateWeek: String) {
     this.isSubmitted = true;
     if (!this.updateForm.valid) {
-      const alert = this.alertController.create({
+      const alert = await this.alertController.create({
         header: 'Please provide all the required values!',
         buttons: [
           {
@@ -91,6 +88,7 @@ export class UpdateTimetableModalComponent implements OnInit {
           },
         ],
       });
+      await alert.present();
       return false;
     } else {
       const startTime = this.updateForm.value.start_time.split('T');
@@ -108,14 +106,15 @@ export class UpdateTimetableModalComponent implements OnInit {
             },
           ],
         });
+        await alert.present();
       } else {
         const updateDate = {
           module_id: this.module_id,
           timeslot: {
-            start_time: startTime,
+            start_time: startTime[0],
             classroom: this.updateForm.value.classroom,
             dayIndex: parseInt(this.updateForm.value.dayIndex),
-            end_time: endTime,
+            end_time: endTime[0],
             day: this.day[this.updateForm.value.dayIndex - 1],
           },
         };

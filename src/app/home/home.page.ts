@@ -10,7 +10,9 @@ import {
   Token,
 } from '@capacitor/push-notifications';
 import { FCM } from '@capacitor-community/fcm';
-import { LoadingController } from '@ionic/angular';
+import { LoadingController, Platform } from '@ionic/angular';
+import { StatusBarInfo } from '@capacitor/status-bar';
+// import { TimetableService } from '../services/timetable.service';
 
 @Component({
   selector: 'app-home',
@@ -28,10 +30,12 @@ export class HomePage implements OnInit {
   private loading;
   numOfClass = 0;
   finish = 0;
+  backbutton: any;
 
   constructor(
     private http: HttpClient,
-    private loadingController: LoadingController
+    private loadingController: LoadingController,
+    private platform: Platform // private timetableService: TimetableService
   ) {}
 
   openBrowser() {
@@ -41,6 +45,9 @@ export class HomePage implements OnInit {
   ionViewDidEnter() {}
 
   ngOnInit() {
+    if (window.location.href == '/home') {
+      this.backbutton = this.platform.backButton.observers.pop();
+    }
     this.presentLoadingWithOptions();
 
     setInterval(() => {
@@ -187,6 +194,7 @@ export class HomePage implements OnInit {
           let data = {
             text: text.substring(0, text.length - 1),
           };
+
           this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
@@ -199,12 +207,13 @@ export class HomePage implements OnInit {
                 }
               });
             });
+
           this.http
             .post(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
               data
             )
-            .subscribe((data) => {
+            .subscribe(async (data) => {
               for (let i = 0; i < Object.keys(data).length; i++) {
                 for (let j = 0; j < timetableList.length; j++) {
                   if (timetableList[j].class_id == data[i].id) {
@@ -212,18 +221,20 @@ export class HomePage implements OnInit {
                   }
                 }
               }
+
               for (let i = 0; i < classList.length; i++) {
                 this.http
                   .get(
                     'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
                       classList[i].data.module_id
                   )
-                  .subscribe((res) => {
+                  .subscribe(async (res) => {
+                    await res;
                     classList[i].data.module_name = res['Name'];
                   });
               }
               this.list.push(classList);
-              this.checkTodayClass();
+              await this.checkTodayClass();
               this.loading.dismiss();
             });
           return this.list;
@@ -272,7 +283,7 @@ export class HomePage implements OnInit {
     });
   }
 
-  checkTodayClass() {
+  async checkTodayClass() {
     for (const data of this.list) {
       for (const test of data) {
         if (test.data.timeslot.dayIndex == this.getToday()) {

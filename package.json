@@ -21,6 +21,7 @@
     "@angular/platform-browser-dynamic": "~13.0.0",
     "@angular/router": "~13.0.0",
     "@awesome-cordova-plugins/bluetooth-le": "^5.39.0",
+    "@awesome-cordova-plugins/nfc": "^5.41.0",
     "@capacitor-community/fcm": "^2.0.2",
     "@capacitor/android": "3.4.1",
     "@capacitor/app": "1.1.0",
@@ -35,6 +36,7 @@
     "@ionic/storage-angular": "^3.0.6",
     "cordova-plugin-bluetoothle": "^6.6.1",
     "firebase": "^9.6.10",
+    "phonegap-nfc": "^1.2.0",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"

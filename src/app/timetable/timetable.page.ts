@@ -2,47 +2,43 @@ import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Storage } from '@capacitor/storage';
-
-interface moduleList {
-  list: Array<any>;
-}
+import { LoadingController, Platform } from '@ionic/angular';
+// import { TimetableService } from '../services/timetable.service';
 
 @Component({
   selector: 'app-timetable',
   templateUrl: 'timetable.page.html',
   styleUrls: ['timetable.page.scss'],
 })
-export class TimetablePage implements OnInit {
+export class TimetablePage {
   module_id;
   courseId;
   course;
+  private loading;
   lecturer: boolean;
   moduleList: any[] = [];
   studentClassList: any[] = [];
   list: any[] = [];
 
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private loadingController: LoadingController,
+    private platform: Platform // private timetableService: TimetableService
+  ) {}
+
   ngOnInit(): void {
     this.getData('timetableDate').then((date) => {
       this.getData('role').then((res) => {
         if (res == 'lecturer') {
           this.lecturer = true;
-          this.getClasses(date);
-        } else if (res == 'student') {
-          this.lecturer = false;
-          this.getCourse();
+          this.load(date);
         }
       });
     });
   }
 
-  doRefresh(event) {
-    console.log('Begin async operation');
-
-    setTimeout(() => {
-      console.log('Async operation has ended');
-      event.target.complete();
-    }, 2000);
+  ionViewWillEnter() {
+    console.log('DIDenter');
   }
 
   getClasses(date: String) {
@@ -71,6 +67,7 @@ export class TimetablePage implements OnInit {
             }
           });
         });
+
       this.http
         .post(
           'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
@@ -79,8 +76,10 @@ export class TimetablePage implements OnInit {
         .subscribe((data) => {
           for (let i = 0; i < Object.keys(data).length; i++) {
             for (let j = 0; j < timetableList.length; j++) {
-              if (timetableList[j].class_id == data[i].id) {
-                classList.push(data[i]);
+              if (timetableList[j].active != false) {
+                if (timetableList[j].class_id == data[i].id) {
+                  classList.push(data[i]);
+                }
               }
             }
           }
@@ -95,52 +94,37 @@ export class TimetablePage implements OnInit {
               });
           }
           this.list.push(classList);
+          this.loading.dismiss();
         });
     });
     return this.list;
   }
 
-  getCourse() {
-    let resJson;
-    let text = '';
-    this.getData('user').then((res) => {
-      resJson = JSON.parse(res);
-      this.http
-        .get(
-          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/' +
-            resJson.CourseID
-        )
-        .subscribe((data) => {
-          this.course = data;
-          for (let i = 0; i < this.course['moduleList'].length; i++) {
-            let parseValue = parseInt(this.course['moduleList'][i]);
-            text += parseValue + ',';
-          }
+  load(date: String) {
+    this.loadingController
+      .create({
+        message: 'Loading Data....',
+      })
+      .then((overlay) => {
+        this.loading = overlay;
+        this.loading.present();
+      });
+    this.list = this.getClasses(date);
+  }
 
-          let postData = {
-            text: text.substring(0, text.length - 1),
-          };
-          this.http
-            .post(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
-              postData
-            )
-            .subscribe((data) => {
-              for (let i = 0; i < Object.keys(data).length; i++) {
-                this.http
-                  .get(
-                    'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                      data[i].data.module_id
-                  )
-                  .subscribe((res) => {
-                    data[i].data.module_name = res['Name'];
-                  });
-              }
-              this.list.push(data);
-            });
-        });
-      return this.list;
+  doRefresh(event) {
+    let complete = false;
+    this.getData('timetableDate').then((date) => {
+      this.list = [];
+      this.load(date);
+      complete = true;
     });
+
+    if ((complete = true)) {
+      setTimeout(() => {
+        event.target.complete();
+      }, 0);
+    }
   }
 
   async getData(input: string) {

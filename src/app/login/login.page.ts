@@ -84,6 +84,7 @@ export class LoginPage implements OnInit {
             message: 'Email or Password is incorrect!',
             buttons: ['Ok'],
           });
+          this.loading.dismiss();
           await alert.present();
         }
       );
