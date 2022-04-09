@@ -4,6 +4,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Storage } from '@capacitor/storage';
 import { AlertController, LoadingController, Platform } from '@ionic/angular';
+import { AuthServiceService } from '../services/auth-service.service';
 
 @Component({
   selector: 'app-login',
@@ -20,16 +21,25 @@ export class LoginPage implements OnInit {
     private http: HttpClient,
     private platform: Platform,
     public alertController: AlertController,
-    private loadingController: LoadingController
-  ) {}
+    private loadingController: LoadingController,
+    private authService: AuthServiceService
+  ) {
+    this.getData('user').then((res) => {
+      if (res != null) {
+        this.router.navigate(['../tabs/home']);
+      }
+    });
+  }
 
   ngOnInit() {
     this.loginForm = new FormGroup({
       email: new FormControl('', Validators.required),
       password: new FormControl('', Validators.required),
     });
-
-    this.setData('timetableDate', this.getSundayOfCurrentWeek());
+  }
+  async getData(input: string) {
+    const { value } = await Storage.get({ key: input });
+    return value;
   }
 
   login() {
@@ -84,28 +94,13 @@ export class LoginPage implements OnInit {
             message: 'Email or Password is incorrect!',
             buttons: ['Ok'],
           });
-          this.loading.dismiss();
           await alert.present();
         }
       );
   }
+
   setData(key: string, value: string) {
     // Store the value under "my-key"
     Storage.set({ key: key, value: value });
-  }
-
-  getSundayOfCurrentWeek() {
-    const today = new Date();
-    // Get last sunday date
-    const lastSunday = today.getDate() - today.getDay();
-    let sunday = new Date(today.setDate(lastSunday));
-    // gettimezoneoffset
-    const final = sunday.setTime(
-      sunday.getTime() - new Date().getTimezoneOffset() * 60 * 1000
-    );
-    const result = new Date(final).toJSON();
-    const dateOnly = result.split('T');
-    const date = dateOnly[0];
-    return date;
   }
 }

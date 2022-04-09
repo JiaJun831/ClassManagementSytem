@@ -2,13 +2,18 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
 import { Storage } from '@capacitor/storage';
+import { ModalController } from '@ionic/angular';
+import { AttendanceModalComponent } from '../attendance-modal/attendance-modal.component';
 @Component({
   selector: 'app-view-attendance',
   templateUrl: './view-attendance.page.html',
   styleUrls: ['./view-attendance.page.scss'],
 })
 export class ViewAttendancePage implements OnInit {
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private modalController: ModalController
+  ) {}
 
   studentList = new Map();
   key = 0;
@@ -19,7 +24,7 @@ export class ViewAttendancePage implements OnInit {
   getAllStudents() {
     this.http
       .get(
-        'http://localhost:5000/attendancetracker-a53a9/us-central1/api/getStudentModuleList'
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/getStudentModuleList'
       )
       .subscribe((result) => {
         this.getData('user').then((res) => {
@@ -43,6 +48,22 @@ export class ViewAttendancePage implements OnInit {
       });
 
     return this.studentList;
+  }
+
+  async openModal(student_id: number) {
+    let modal = await this.modalController.create({
+      component: AttendanceModalComponent,
+      componentProps: {
+        student_id: student_id,
+      },
+    });
+    modal.onDidDismiss().then((res) => {
+      // this.getData('timetableDate').then((date) => {
+      //   this.list = [];
+      //   this.load(date);
+      // });
+    });
+    return await modal.present();
   }
 
   async getData(input: string) {

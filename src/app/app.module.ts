@@ -9,8 +9,15 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AngularFireModule } from '@angular/fire/compat';
 import { environment } from '../environments/environment';
 import { UpdateTimetableModalComponent } from './update-timetable-modal/update-timetable-modal.component';
+import { AngularFireAuthModule } from '@angular/fire/compat/auth';
+import { AttendanceModalComponent } from './attendance-modal/attendance-modal.component';
+
 @NgModule({
-  declarations: [AppComponent, UpdateTimetableModalComponent],
+  declarations: [
+    AppComponent,
+    UpdateTimetableModalComponent,
+    AttendanceModalComponent,
+  ],
   entryComponents: [],
   imports: [
     BrowserModule,
@@ -20,6 +27,7 @@ import { UpdateTimetableModalComponent } from './update-timetable-modal/update-t
     FormsModule,
     ReactiveFormsModule,
     AngularFireModule.initializeApp(environment.config),
+    AngularFireAuthModule,
   ],
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },

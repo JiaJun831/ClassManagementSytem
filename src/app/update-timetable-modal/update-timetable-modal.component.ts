@@ -122,7 +122,8 @@ export class UpdateTimetableModalComponent implements OnInit {
           if (updateWeek == 'week') {
             this.http
               .post(
-                `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
+                // `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
+                `http://localhost:5000/attendancetracker-a53a9/us-central1/api/timetables/${date}/${this.class_id}`,
                 { newClass: updateDate }
               )
               .subscribe(async (res) => {

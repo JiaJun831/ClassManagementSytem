@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Storage } from '@capacitor/storage';
 import { LoadingController, Platform } from '@ionic/angular';
+import { time } from 'console';
 // import { TimetableService } from '../services/timetable.service';
 
 @Component({
@@ -32,75 +33,182 @@ export class TimetablePage {
         if (res == 'lecturer') {
           this.lecturer = true;
           this.load(date);
+        } else {
+          this.load(date);
         }
       });
     });
   }
 
-  ionViewWillEnter() {
-    console.log('DIDenter');
-  }
-
-  getClasses(date: String) {
+  getClasses(date: string) {
     let resJson;
-    let text = '';
+
     let classList = [];
     let timetableList = [];
+    let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
-      for (let i = 0; i < resJson.module_id.length; i++) {
-        let parseValue = parseInt(resJson.module_id[i]);
-        text += parseValue + ',';
-      }
-      let data = {
-        text: text.substring(0, text.length - 1),
-      };
-      this.http
-        .get(
-          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
-            date
-        )
-        .subscribe((res) => {
-          res['timetable'].forEach((result) => {
-            if (result.active == true) {
-              timetableList.push(result);
-            }
-          });
-        });
+      this.getData('role').then(async (resp) => {
+        if (resp == 'student') {
+          let p = this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/' +
+                resJson.CourseID
+            )
+            .toPromise();
 
-      this.http
-        .post(
-          'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
-          data
-        )
-        .subscribe((data) => {
-          for (let i = 0; i < Object.keys(data).length; i++) {
-            for (let j = 0; j < timetableList.length; j++) {
-              if (timetableList[j].active != false) {
-                if (timetableList[j].class_id == data[i].id) {
-                  classList.push(data[i]);
+          await p;
+
+          let course;
+          await p.then((data) => {
+            course = data;
+          });
+
+          console.log(date);
+          let p2 = this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+                date
+            )
+            .toPromise();
+
+          await p2;
+          await p2.then((res) => {
+            res['timetable'].forEach((result) => {
+              if (result.active == true) {
+                timetableList.push(result);
+              }
+            });
+          });
+
+          for (let i = 0; i < course['moduleList'].length; i++) {
+            let parseValue = parseInt(course['moduleList'][i]);
+            text += parseValue + ',';
+          }
+
+          let postData = {
+            text: text.substring(0, text.length - 1),
+          };
+
+          let p3 = this.http
+            .post(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
+              postData
+            )
+            .toPromise();
+
+          await p3;
+
+          await p3.then((res) => {
+            for (let i = 0; i < Object.keys(res).length; i++) {
+              for (let j = 0; j < timetableList.length; j++) {
+                if (timetableList[j].class_id == res[i].id) {
+                  classList.push(res[i]);
                 }
               }
             }
-          }
+          });
+
+          let promises = [];
+
           for (let i = 0; i < classList.length; i++) {
-            this.http
+            let p = this.http
               .get(
                 'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
                   classList[i].data.module_id
               )
-              .subscribe((res) => {
-                classList[i].data.module_name = res['Name'];
-              });
+              .toPromise();
+            promises.push(p);
+          }
+
+          await Promise.all(promises);
+
+          let count = 0;
+          for (let p of promises) {
+            p.then((res) => {
+              classList[count].data.module_name = res.Name;
+              count++;
+            });
           }
           this.list.push(classList);
           this.loading.dismiss();
-        });
+          return this.list;
+        } else if (resp == 'lecturer') {
+          for (let i = 0; i < resJson.module_id.length; i++) {
+            let parseValue = parseInt(resJson.module_id[i]);
+            text += parseValue + ',';
+          }
+          let data = {
+            text: text.substring(0, text.length - 1),
+          };
+
+          let p = this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+                date
+            )
+            .toPromise();
+
+          await p;
+          await p.then((res) => {
+            res['timetable'].forEach((result) => {
+              if (result.active == true) {
+                timetableList.push(result);
+              }
+            });
+          });
+
+          let p2 = this.http
+            .post(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
+              data
+            )
+            .toPromise();
+
+          await p2;
+
+          await p2.then((res) => {
+            for (let i = 0; i < Object.keys(res).length; i++) {
+              for (let j = 0; j < timetableList.length; j++) {
+                if (timetableList[j].class_id == res[i].id) {
+                  classList.push(res[i]);
+                }
+              }
+            }
+          });
+
+          let promises = [];
+
+          for (let i = 0; i < classList.length; i++) {
+            let p = this.http
+              .get(
+                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+                  classList[i].data.module_id
+              )
+              .toPromise();
+            promises.push(p);
+          }
+
+          await Promise.all(promises);
+
+          let count = 0;
+          for (let p of promises) {
+            p.then((res) => {
+              classList[count].data.module_name = res.Name;
+              count++;
+            });
+          }
+
+          this.list.push(classList);
+          this.loading.dismiss();
+          return this.list;
+        }
+      });
     });
-    return this.list;
   }
 
-  load(date: String) {
+  load(date: string) {
+    var startTime = performance.now();
     this.loadingController
       .create({
         message: 'Loading Data....',
@@ -109,7 +217,10 @@ export class TimetablePage {
         this.loading = overlay;
         this.loading.present();
       });
-    this.list = this.getClasses(date);
+    this.getClasses(date);
+    var endTime = performance.now();
+
+    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
   }
 
   doRefresh(event) {

@@ -23,7 +23,6 @@ export class HomePage implements OnInit {
   firstName: any;
   today: Date;
   time: any;
-  course;
   day: any;
   list: any[] = [];
   lecturer: boolean;
@@ -42,17 +41,18 @@ export class HomePage implements OnInit {
     Browser.open({ url: 'https://www.dkit.ie/' });
   }
 
-  ionViewDidEnter() {}
+  async ngOnInit() {
+    this.setData('timetableDate', this.getSundayOfCurrentWeek());
 
-  ngOnInit() {
+    this.time = this.getCurrentTime();
+    setInterval(() => {
+      this.time = this.getCurrentTime();
+    }, 1000 * 60);
+
     if (window.location.href == '/home') {
       this.backbutton = this.platform.backButton.observers.pop();
     }
-    this.presentLoadingWithOptions();
-
-    setInterval(() => {
-      this.time = this.getCurrentTime();
-    }, 1000);
+    // this.presentLoadingWithOptions();
 
     const isPushNotificationsAvailable =
       Capacitor.isPluginAvailable('PushNotifications');
@@ -67,7 +67,7 @@ export class HomePage implements OnInit {
           if (result.receive === 'granted') {
             //       // Register with Apple / Google to receive push via APNS/FCM
             PushNotifications.register();
-            FCM.subscribeTo({ topic: res })
+            FCM.subscribeTo({ topic: 'test' })
               .then()
               .catch((err) => console.log(err));
             FCM.getToken()
@@ -94,34 +94,15 @@ export class HomePage implements OnInit {
         });
       });
 
-      // const addListeners = async () => {
-      //   await PushNotifications.addListener('registration', (token) => {
-      //     console.info('Registration token: ', token.value);
-      //   });
-
-      //   await PushNotifications.addListener('registrationError', (err) => {
-      //     console.error('Registration error: ', err.error);
-      //   });
-
-      //   await PushNotifications.addListener(
-      //     'pushNotificationReceived',
-      //     (notification) => {
-      //       console.log('Push notification received: ', notification);
-      //     }
-      //   );
-
-      //   await PushNotifications.addListener(
-      //     'pushNotificationActionPerformed',
-      //     (notification) => {
-      //       console.log(
-      //         'Push notification action performed',
-      //         notification.actionId,
-      //         notification.inputValue
-      //       );
-      //     }
-      //   );
-      // };
+      PushNotifications.addListener(
+        'pushNotificationReceived',
+        (notification) => {
+          alert('Push notification received: ' + notification);
+        }
+      );
     }
+
+    this.presentLoadingWithOptions();
   }
 
   async getData(input: string) {
@@ -147,44 +128,90 @@ export class HomePage implements OnInit {
     let text = '';
     this.getData('user').then((res) => {
       resJson = JSON.parse(res);
-      this.getData('role').then((resp) => {
+      this.getData('role').then(async (resp) => {
         if (resp == 'student') {
-          this.http
+          let p = this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/' +
                 resJson.CourseID
             )
-            .subscribe((data) => {
-              this.course = data;
-              for (let i = 0; i < this.course['moduleList'].length; i++) {
-                let parseValue = parseInt(this.course['moduleList'][i]);
-                text += parseValue + ',';
-              }
+            .toPromise();
 
-              let postData = {
-                text: text.substring(0, text.length - 1),
-              };
-              this.http
-                .post(
-                  'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
-                  postData
-                )
-                .subscribe((data) => {
-                  for (let i = 0; i < Object.keys(data).length; i++) {
-                    this.http
-                      .get(
-                        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                          data[i].data.module_id
-                      )
-                      .subscribe((res) => {
-                        data[i].data.module_name = res['Name'];
-                      });
-                  }
-                  this.list.push(data);
-                  this.checkTodayClass();
-                  this.loading.dismiss();
-                });
+          await p;
+
+          let course;
+          await p.then((data) => {
+            course = data;
+          });
+          let p2 = this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+                date
+            )
+            .toPromise();
+
+          await p2;
+          await p2.then((res) => {
+            console.log(res);
+            res['timetable'].forEach((result) => {
+              if (result.active == true) {
+                timetableList.push(result);
+              }
             });
+          });
+
+          for (let i = 0; i < course['moduleList'].length; i++) {
+            let parseValue = parseInt(course['moduleList'][i]);
+            text += parseValue + ',';
+          }
+
+          let postData = {
+            text: text.substring(0, text.length - 1),
+          };
+
+          let p3 = this.http
+            .post(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
+              postData
+            )
+            .toPromise();
+
+          await p3;
+
+          await p3.then((res) => {
+            for (let i = 0; i < Object.keys(res).length; i++) {
+              for (let j = 0; j < timetableList.length; j++) {
+                if (timetableList[j].class_id == res[i].id) {
+                  classList.push(res[i]);
+                }
+              }
+            }
+          });
+
+          let promises = [];
+
+          for (let i = 0; i < classList.length; i++) {
+            let p = this.http
+              .get(
+                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+                  classList[i].data.module_id
+              )
+              .toPromise();
+            promises.push(p);
+          }
+
+          await Promise.all(promises);
+
+          let count = 0;
+          for (let p of promises) {
+            p.then((res) => {
+              classList[count].data.module_name = res.Name;
+              count++;
+            });
+          }
+          this.list.push(classList);
+          await this.checkTodayClass();
+          this.loading.dismiss();
           return this.list;
         } else if (resp == 'lecturer') {
           for (let i = 0; i < resJson.module_id.length; i++) {
@@ -195,78 +222,87 @@ export class HomePage implements OnInit {
             text: text.substring(0, text.length - 1),
           };
 
-          this.http
+          let p = this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
                 date
             )
-            .subscribe((res) => {
-              res['timetable'].forEach((result) => {
-                if (result.active == true) {
-                  timetableList.push(result);
-                }
-              });
-            });
+            .toPromise();
 
-          this.http
+          await p;
+          await p.then((res) => {
+            res['timetable'].forEach((result) => {
+              if (result.active == true) {
+                timetableList.push(result);
+              }
+            });
+          });
+
+          let p2 = this.http
             .post(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
               data
             )
-            .subscribe(async (data) => {
-              for (let i = 0; i < Object.keys(data).length; i++) {
-                for (let j = 0; j < timetableList.length; j++) {
-                  if (timetableList[j].class_id == data[i].id) {
-                    classList.push(data[i]);
-                  }
+            .toPromise();
+
+          await p2;
+
+          await p2.then((res) => {
+            for (let i = 0; i < Object.keys(res).length; i++) {
+              for (let j = 0; j < timetableList.length; j++) {
+                if (timetableList[j].class_id == res[i].id) {
+                  classList.push(res[i]);
                 }
               }
+            }
+          });
 
-              for (let i = 0; i < classList.length; i++) {
-                this.http
-                  .get(
-                    'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                      classList[i].data.module_id
-                  )
-                  .subscribe(async (res) => {
-                    await res;
-                    classList[i].data.module_name = res['Name'];
-                  });
-              }
-              this.list.push(classList);
-              await this.checkTodayClass();
-              this.loading.dismiss();
+          let promises = [];
+
+          for (let i = 0; i < classList.length; i++) {
+            let p = this.http
+              .get(
+                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+                  classList[i].data.module_id
+              )
+              .toPromise();
+            promises.push(p);
+          }
+
+          await Promise.all(promises);
+
+          let count = 0;
+          for (let p of promises) {
+            p.then((res) => {
+              classList[count].data.module_name = res.Name;
+              count++;
             });
+          }
+
+          this.list.push(classList);
+          await this.checkTodayClass();
+          this.loading.dismiss();
           return this.list;
         }
       });
     });
   }
 
-  isNumber(val: any): boolean {
-    return typeof val === 'number';
-  }
-
-  isArray(val: string | any[]): boolean {
-    if (val.length > 1) {
-      return true;
-    }
-  }
-
-  presentLoadingWithOptions() {
-    this.loadingController
+  async presentLoadingWithOptions() {
+    var startTime = performance.now();
+    await this.loadingController
       .create({
         message: 'Please wait...',
         animated: true,
         keyboardClose: true,
         spinner: 'bubbles',
-        // duration: 2000,
       })
       .then((overlay) => {
         this.loading = overlay;
         this.loading.present();
       });
-    this.getData('role').then((res) => {
+
+    await this.getData('role').then((res) => {
       if (res == 'lecturer') {
         this.lecturer = true;
       } else {
@@ -274,13 +310,18 @@ export class HomePage implements OnInit {
       }
     });
 
-    this.getData('user').then((res) => {
+    await this.getData('user').then(async (res) => {
       let resJson = JSON.parse(res);
       this.firstName = resJson.FirstName;
+      await this.firstName;
     });
+
     this.getData('timetableDate').then((date) => {
       this.getCourse(date);
     });
+    var endTime = performance.now();
+
+    console.log(`Call to doSomething took ${endTime - startTime} milliseconds`);
   }
 
   async checkTodayClass() {
@@ -288,11 +329,33 @@ export class HomePage implements OnInit {
       for (const test of data) {
         if (test.data.timeslot.dayIndex == this.getToday()) {
           this.numOfClass++;
-          if (test.data.timeslot.start_time.substring(0, 2) < this.time) {
+          if (
+            parseInt(test.data.timeslot.start_time.substring(0, 2)) < this.time
+          ) {
             this.finish++;
           }
         }
       }
     }
+  }
+
+  setData(key: string, value: string) {
+    // Store the value under "my-key"
+    Storage.set({ key: key, value: value });
+  }
+
+  getSundayOfCurrentWeek() {
+    const today = new Date();
+    // Get last sunday date
+    const lastSunday = today.getDate() - today.getDay();
+    let sunday = new Date(today.setDate(lastSunday));
+    // gettimezoneoffset
+    const final = sunday.setTime(
+      sunday.getTime() - new Date().getTimezoneOffset() * 60 * 1000
+    );
+    const result = new Date(final).toJSON();
+    const dateOnly = result.split('T');
+    const date = dateOnly[0];
+    return date;
   }
 }
