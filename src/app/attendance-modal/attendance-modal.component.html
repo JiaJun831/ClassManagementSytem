@@ -8,6 +8,27 @@
 </ion-header>
 
 <ion-content>
-  <p>{{overallAttendance}}</p>
+  <ion-row>
+    <ion-col>Yearly Attendance</ion-col>
+    <ion-col>Weekly Attendance</ion-col>
+  </ion-row>
+  <ion-row>
+    <ion-col>{{overallYearAttendance}}</ion-col>
+    <ion-col>{{overallWeekAttendance}}</ion-col>
+  </ion-row>
+
+  <hr style="border:1px solid white" />
+  <div *ngFor="let list of attendanceList">
+    <ion-row>
+      <!-- <p>{{list}}</p> -->
+      <ion-col>{{list.Name}}</ion-col>
+      <ng-template [ngIf]="list.attendance != 'N/A'">
+        <ion-col>{{list.attendance}}%</ion-col>
+      </ng-template>
+      <ng-template [ngIf]="list.attendance == 'N/A'">
+        <ion-col>{{list.attendance}}</ion-col>
+      </ng-template>
+    </ion-row>
+  </div>
 
 </ion-content>

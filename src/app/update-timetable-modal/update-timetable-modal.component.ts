@@ -11,6 +11,7 @@ import { Storage } from '@capacitor/storage';
 export class UpdateTimetableModalComponent implements OnInit {
   @Input() class_id: number;
   @Input() module_id: number;
+  @Input() module_name: string;
   updateForm: FormGroup;
   isSubmitted = false;
   day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -110,6 +111,7 @@ export class UpdateTimetableModalComponent implements OnInit {
       } else {
         const updateDate = {
           module_id: this.module_id,
+          module_name: this.module_name,
           timeslot: {
             start_time: startTime[0],
             classroom: this.updateForm.value.classroom,
@@ -122,8 +124,8 @@ export class UpdateTimetableModalComponent implements OnInit {
           if (updateWeek == 'week') {
             this.http
               .post(
-                // `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
-                `http://localhost:5000/attendancetracker-a53a9/us-central1/api/timetables/${date}/${this.class_id}`,
+                `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
+                // `http://localhost:5000/attendancetracker-a53a9/us-central1/api/timetables/${date}/${this.class_id}`,
                 { newClass: updateDate }
               )
               .subscribe(async (res) => {

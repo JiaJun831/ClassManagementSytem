@@ -88,7 +88,7 @@ export class ModifyTimetablePage implements OnInit {
     return this.list;
   }
 
-  async openModal(class_id: number, module_id: number) {
+  async openModal(class_id: number, module_id: number, module_name: string) {
     let modal = await this.modalController.create({
       component: UpdateTimetableModalComponent,
       componentProps: {

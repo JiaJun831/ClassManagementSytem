@@ -50,11 +50,12 @@ export class ViewAttendancePage implements OnInit {
     return this.studentList;
   }
 
-  async openModal(student_id: number) {
+  async openModal(student_id: number, course_id: []) {
     let modal = await this.modalController.create({
       component: AttendanceModalComponent,
       componentProps: {
         student_id: student_id,
+        course_id: course_id,
       },
     });
     modal.onDidDismiss().then((res) => {

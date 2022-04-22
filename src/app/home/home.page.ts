@@ -3,16 +3,10 @@ import { Component, OnInit } from '@angular/core';
 import { Browser } from '@capacitor/browser';
 import { Capacitor } from '@capacitor/core';
 import { Storage } from '@capacitor/storage';
-import {
-  ActionPerformed,
-  PushNotificationSchema,
-  PushNotifications,
-  Token,
-} from '@capacitor/push-notifications';
+import { PushNotifications, Token } from '@capacitor/push-notifications';
 import { FCM } from '@capacitor-community/fcm';
-import { LoadingController, Platform } from '@ionic/angular';
-import { StatusBarInfo } from '@capacitor/status-bar';
-// import { TimetableService } from '../services/timetable.service';
+import { AlertController, LoadingController, Platform } from '@ionic/angular';
+import { NFC } from '@awesome-cordova-plugins/nfc/ngx';
 
 @Component({
   selector: 'app-home',
@@ -34,7 +28,9 @@ export class HomePage implements OnInit {
   constructor(
     private http: HttpClient,
     private loadingController: LoadingController,
-    private platform: Platform // private timetableService: TimetableService
+    private platform: Platform, // private timetableService: TimetableService
+    private nfc: NFC, // private ndef: Ndef,
+    private alertController: AlertController
   ) {}
 
   openBrowser() {
@@ -42,6 +38,26 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
+    this.nfc
+      .addNdefListener(
+        () => {
+          console.log('hhh');
+          this.presentAlert('ok');
+        },
+        (err) => {
+          this.presentAlert('ko' + err);
+        }
+      )
+      .subscribe((event) => {
+        // console.log(event);
+        // console.log(JSON.stringify(event));
+
+        // console.log(event.tag.ndefMessage[0].payload);
+        this.presentAlert(
+          this.nfc.bytesToString(event.tag.ndefMessage[0].payload).substring(3)
+        );
+      });
+
     this.setData('timetableDate', this.getSundayOfCurrentWeek());
 
     this.time = this.getCurrentTime();
@@ -104,7 +120,15 @@ export class HomePage implements OnInit {
 
     this.presentLoadingWithOptions();
   }
+  async presentAlert(mess) {
+    const alert = await this.alertController.create({
+      header: 'attention',
+      message: mess,
+      buttons: ['OK'],
+    });
 
+    await alert.present();
+  }
   async getData(input: string) {
     const { value } = await Storage.get({ key: input });
     return value;
@@ -168,6 +192,7 @@ export class HomePage implements OnInit {
           let postData = {
             text: text.substring(0, text.length - 1),
           };
+          console.log(postData);
 
           let p3 = this.http
             .post(
