@@ -11,7 +11,8 @@ import { environment } from '../environments/environment';
 import { UpdateTimetableModalComponent } from './update-timetable-modal/update-timetable-modal.component';
 import { AngularFireAuthModule } from '@angular/fire/compat/auth';
 import { AttendanceModalComponent } from './attendance-modal/attendance-modal.component';
-import { NFC } from '@awesome-cordova-plugins/nfc/ngx';
+import { NFC, Ndef } from '@awesome-cordova-plugins/nfc/ngx';
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -33,6 +34,7 @@ import { NFC } from '@awesome-cordova-plugins/nfc/ngx';
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     HttpClient,
     NFC,
+    Ndef,
   ],
   bootstrap: [AppComponent],
 })

@@ -94,6 +94,7 @@ export class ModifyTimetablePage implements OnInit {
       componentProps: {
         class_id: class_id,
         module_id: module_id,
+        module_name: module_name,
       },
     });
     modal.onDidDismiss().then((res) => {

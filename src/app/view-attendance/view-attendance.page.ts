@@ -58,12 +58,7 @@ export class ViewAttendancePage implements OnInit {
         course_id: course_id,
       },
     });
-    modal.onDidDismiss().then((res) => {
-      // this.getData('timetableDate').then((date) => {
-      //   this.list = [];
-      //   this.load(date);
-      // });
-    });
+    modal.onDidDismiss().then((res) => {});
     return await modal.present();
   }
 

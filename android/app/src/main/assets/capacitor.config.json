@@ -3,11 +3,13 @@
 	"appName": "Class Management System",
 	"webDir": "www",
 	"bundledWebRuntime": false,
-	"PushNotifications": {
-		"presentationOptions": [
-			"badge",
-			"sound",
-			"alert"
-		]
+	"plugins": {
+		"PushNotifications": {
+			"presentationOptions": [
+				"badge",
+				"sound",
+				"alert"
+			]
+		}
 	}
 }

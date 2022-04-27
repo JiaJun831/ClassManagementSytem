@@ -80,7 +80,7 @@ export class TimetablePage {
               }
             });
           });
-
+          console.log(timetableList);
           for (let i = 0; i < course['moduleList'].length; i++) {
             let parseValue = parseInt(course['moduleList'][i]);
             text += parseValue + ',';
@@ -141,7 +141,7 @@ export class TimetablePage {
           let data = {
             text: text.substring(0, text.length - 1),
           };
-
+          console.log(data);
           let p = this.http
             .get(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
@@ -157,7 +157,7 @@ export class TimetablePage {
               }
             });
           });
-
+          console.log(timetableList);
           let p2 = this.http
             .post(
               'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
@@ -176,7 +176,7 @@ export class TimetablePage {
               }
             }
           });
-
+          console.log(classList);
           let promises = [];
 
           for (let i = 0; i < classList.length; i++) {

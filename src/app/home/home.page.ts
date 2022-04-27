@@ -6,7 +6,7 @@ import { Storage } from '@capacitor/storage';
 import { PushNotifications, Token } from '@capacitor/push-notifications';
 import { FCM } from '@capacitor-community/fcm';
 import { AlertController, LoadingController, Platform } from '@ionic/angular';
-import { NFC } from '@awesome-cordova-plugins/nfc/ngx';
+import { NFC, Ndef } from '@awesome-cordova-plugins/nfc/ngx';
 
 @Component({
   selector: 'app-home',
@@ -24,13 +24,15 @@ export class HomePage implements OnInit {
   numOfClass = 0;
   finish = 0;
   backbutton: any;
-
+  id: any;
+  user: any;
   constructor(
     private http: HttpClient,
     private loadingController: LoadingController,
-    private platform: Platform, // private timetableService: TimetableService
-    private nfc: NFC, // private ndef: Ndef,
-    private alertController: AlertController
+    private platform: Platform,
+    private nfc: NFC,
+    private alertController: AlertController,
+    private ndef: Ndef
   ) {}
 
   openBrowser() {
@@ -38,25 +40,9 @@ export class HomePage implements OnInit {
   }
 
   async ngOnInit() {
-    this.nfc
-      .addNdefListener(
-        () => {
-          console.log('hhh');
-          this.presentAlert('ok');
-        },
-        (err) => {
-          this.presentAlert('ko' + err);
-        }
-      )
-      .subscribe((event) => {
-        // console.log(event);
-        // console.log(JSON.stringify(event));
-
-        // console.log(event.tag.ndefMessage[0].payload);
-        this.presentAlert(
-          this.nfc.bytesToString(event.tag.ndefMessage[0].payload).substring(3)
-        );
-      });
+    await this.getData('userID').then((res) => {
+      res = this.id;
+    });
 
     this.setData('timetableDate', this.getSundayOfCurrentWeek());
 
@@ -68,70 +54,9 @@ export class HomePage implements OnInit {
     if (window.location.href == '/home') {
       this.backbutton = this.platform.backButton.observers.pop();
     }
-    // this.presentLoadingWithOptions();
-
-    const isPushNotificationsAvailable =
-      Capacitor.isPluginAvailable('PushNotifications');
-
-    if (isPushNotificationsAvailable) {
-      //   // Request permission to use push notifications
-      //   // iOS will prompt user and return if they granted permission or not
-      //   // Android will just grant without prompting
-
-      PushNotifications.requestPermissions().then((result) => {
-        this.getData('userID').then((res) => {
-          if (result.receive === 'granted') {
-            //       // Register with Apple / Google to receive push via APNS/FCM
-            PushNotifications.register();
-            FCM.subscribeTo({ topic: 'test' })
-              .then()
-              .catch((err) => console.log(err));
-            FCM.getToken()
-              .then()
-              .catch((err) => console.log(err));
-          } else {
-          }
-        });
-      });
-
-      PushNotifications.addListener('registration', (token: Token) => {
-        this.getData('userID').then((res) => {
-          let postData = {
-            userID: res,
-            token: token.value,
-          };
-
-          this.http
-            .post(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/notificationToken',
-              postData
-            )
-            .subscribe((res) => {});
-        });
-      });
-
-      PushNotifications.addListener(
-        'pushNotificationReceived',
-        (notification) => {
-          alert('Push notification received: ' + notification);
-        }
-      );
-    }
-
+    this.readNFC();
+    this.notificationToken();
     this.presentLoadingWithOptions();
-  }
-  async presentAlert(mess) {
-    const alert = await this.alertController.create({
-      header: 'attention',
-      message: mess,
-      buttons: ['OK'],
-    });
-
-    await alert.present();
-  }
-  async getData(input: string) {
-    const { value } = await Storage.get({ key: input });
-    return value;
   }
 
   getCurrentTime() {
@@ -145,13 +70,9 @@ export class HomePage implements OnInit {
   }
 
   getCourse(date: string) {
-    let resJson;
-
-    let classList = [];
-    let timetableList = [];
     let text = '';
     this.getData('user').then((res) => {
-      resJson = JSON.parse(res);
+      let resJson = JSON.parse(res);
       this.getData('role').then(async (resp) => {
         if (resp == 'student') {
           let p = this.http
@@ -167,22 +88,6 @@ export class HomePage implements OnInit {
           await p.then((data) => {
             course = data;
           });
-          let p2 = this.http
-            .get(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
-                date
-            )
-            .toPromise();
-
-          await p2;
-          await p2.then((res) => {
-            console.log(res);
-            res['timetable'].forEach((result) => {
-              if (result.active == true) {
-                timetableList.push(result);
-              }
-            });
-          });
 
           for (let i = 0; i < course['moduleList'].length; i++) {
             let parseValue = parseInt(course['moduleList'][i]);
@@ -192,26 +97,8 @@ export class HomePage implements OnInit {
           let postData = {
             text: text.substring(0, text.length - 1),
           };
-          console.log(postData);
 
-          let p3 = this.http
-            .post(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
-              postData
-            )
-            .toPromise();
-
-          await p3;
-
-          await p3.then((res) => {
-            for (let i = 0; i < Object.keys(res).length; i++) {
-              for (let j = 0; j < timetableList.length; j++) {
-                if (timetableList[j].class_id == res[i].id) {
-                  classList.push(res[i]);
-                }
-              }
-            }
-          });
+          let classList = await this.classList(date, postData);
 
           let promises = [];
 
@@ -243,45 +130,12 @@ export class HomePage implements OnInit {
             let parseValue = parseInt(resJson.module_id[i]);
             text += parseValue + ',';
           }
-          let data = {
+          let postData = {
             text: text.substring(0, text.length - 1),
           };
 
-          let p = this.http
-            .get(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
-                date
-            )
-            .toPromise();
-
-          await p;
-          await p.then((res) => {
-            res['timetable'].forEach((result) => {
-              if (result.active == true) {
-                timetableList.push(result);
-              }
-            });
-          });
-
-          let p2 = this.http
-            .post(
-              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
-              data
-            )
-            .toPromise();
-
-          await p2;
-
-          await p2.then((res) => {
-            for (let i = 0; i < Object.keys(res).length; i++) {
-              for (let j = 0; j < timetableList.length; j++) {
-                if (timetableList[j].class_id == res[i].id) {
-                  classList.push(res[i]);
-                }
-              }
-            }
-          });
-
+          let classList = await this.classList(date, postData);
+          console.log(classList);
           let promises = [];
 
           for (let i = 0; i < classList.length; i++) {
@@ -311,6 +165,49 @@ export class HomePage implements OnInit {
         }
       });
     });
+  }
+
+  async timetableList(date: string) {
+    let timetableList = [];
+    let p2 = this.http
+      .get(
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+          date
+      )
+      .toPromise();
+
+    await p2;
+    await p2.then((res) => {
+      res['timetable'].forEach((result) => {
+        if (result.active == true) {
+          timetableList.push(result);
+        }
+      });
+    });
+    return timetableList;
+  }
+
+  async classList(date: string, postData: any) {
+    let timetableList = await this.timetableList(date);
+    let classList = [];
+    let p3 = this.http
+      .post(
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
+        postData
+      )
+      .toPromise();
+
+    await p3;
+    await p3.then((res) => {
+      for (let i = 0; i < Object.keys(res).length; i++) {
+        for (let j = 0; j < timetableList.length; j++) {
+          if (timetableList[j].class_id == res[i].id) {
+            classList.push(res[i]);
+          }
+        }
+      }
+    });
+    return classList;
   }
 
   async presentLoadingWithOptions() {
@@ -382,5 +279,178 @@ export class HomePage implements OnInit {
     const dateOnly = result.split('T');
     const date = dateOnly[0];
     return date;
+  }
+
+  notificationToken() {
+    const isPushNotificationsAvailable =
+      Capacitor.isPluginAvailable('PushNotifications');
+
+    if (isPushNotificationsAvailable) {
+      this.http
+        .get(
+          `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/notificationToken/${this.id}`
+        )
+        .subscribe((result) => {
+          console.log(result);
+          PushNotifications.addListener(
+            'registration',
+            async (token: Token) => {
+              await this.getData('userID').then((res) => {
+                let postData = {
+                  userID: res,
+                  token: token.value,
+                };
+                if (postData.token != result['token']) {
+                  this.http
+                    .post(
+                      'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/notificationToken',
+                      postData
+                    )
+                    .subscribe((res) => {});
+                }
+              });
+            }
+          );
+        });
+      PushNotifications.requestPermissions().then((result) => {
+        if (result.receive === 'granted') {
+          PushNotifications.register();
+          this.getData('user').then(async (user) => {
+            let userJSON = JSON.parse(user);
+            this.http
+              .get(
+                `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/${userJSON.CourseID}`
+              )
+              .subscribe((res) => {
+                FCM.subscribeTo({ topic: res['name'].replace(/\s/g, '') })
+                  .then()
+                  .catch((err) => console.log(err));
+                this.ndef;
+              });
+          });
+        }
+      });
+
+      PushNotifications.addListener(
+        'pushNotificationReceived',
+        (notification) => {
+          alert(
+            'Push notification received: ' +
+              notification.title +
+              ' ' +
+              notification.body
+          );
+        }
+      );
+
+      PushNotifications.addListener(
+        'pushNotificationActionPerformed',
+        (notification) => {
+          alert(
+            'Push notification received: ' + notification.notification.title
+          );
+        }
+      );
+    }
+  }
+
+  readNFC() {
+    let text = '';
+    let classList = [];
+    let attendance = false;
+    this.getData('role').then(async (role) => {
+      if (role == 'student') {
+        console.log('Is Student');
+        this.getData('user').then(async (res) => {
+          let resJson = JSON.parse(res);
+          let p = this.http
+            .get(
+              'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses/' +
+                resJson.CourseID
+            )
+            .toPromise();
+
+          await p;
+
+          let course;
+          await p.then((data) => {
+            course = data;
+          });
+          for (let i = 0; i < course['moduleList'].length; i++) {
+            let parseValue = parseInt(course['moduleList'][i]);
+            text += parseValue + ',';
+          }
+
+          let postData = {
+            text: text.substring(0, text.length - 1),
+          };
+          await this.getData('timetableDate').then(async (date) => {
+            date = date;
+            classList = await this.classList(date, postData);
+
+            this.nfc
+              .addNdefListener(
+                () => {
+                  this.presentAlert('ok');
+                },
+                (err) => {
+                  this.presentAlert('Error : ' + err);
+                }
+              )
+              .subscribe(async (event) => {
+                await this.getData('userID').then(async (id) => {
+                  let classroom = this.nfc
+                    .bytesToString(event.tag.ndefMessage[0].payload)
+                    .substring(3);
+
+                  for (let i = 0; i < classList.length; i++) {
+                    if (
+                      classList[i].data.timeslot.dayIndex == this.getToday() &&
+                      classList[i].data.timeslot.start_time.substring(0, 2) <=
+                        this.getCurrentTime() &&
+                      classList[i].data.timeslot.end_time.substring(0, 2) >=
+                        this.getCurrentTime() &&
+                      classList[i].data.timeslot.classroom == classroom
+                    ) {
+                      console.log('Class found');
+                      let class_id = classList[i].id;
+                      attendance = true;
+                      console.log(
+                        `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/updateAttendance/updateTimetables/${date}/${class_id}}/${id}`
+                      );
+                      this.http
+                        .get(
+                          `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/updateAttendance/updateTimetables/${date}/${class_id}/${id}`
+                        )
+                        .subscribe((res) => {
+                          this.presentAlert('Sign Attendance Success.');
+                        });
+                    }
+                  }
+                  if (attendance == false) {
+                    console.log('No class in this time : ' + classroom);
+                    this.presentAlert('No class in this time : ' + classroom);
+                  }
+                });
+              });
+          });
+        });
+      }
+    });
+  }
+
+  async presentAlert(mess) {
+    const alert = await this.alertController.create({
+      header: 'attention',
+      message: mess,
+      buttons: ['OK'],
+    });
+
+    await alert.present();
+  }
+
+  async getData(input: string) {
+    const { value } = await Storage.get({ key: input });
+    return value;
   }
 }
