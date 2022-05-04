@@ -35,9 +35,6 @@
           <ng-template [ngIf]="ts.data.timeslot.dayIndex == getToday()">
             <ng-template [ngIf]="ts.data.timeslot.start_time.substring(0,2) >= time">
               <p>
-                <!-- {{[ts.data.timeslot.start_time.slice(0,2),ts.data.timeslot.start_time.slice(2)].join(':') }} -
-                {{[ts.data.timeslot.end_time.slice(0,2),ts.data.timeslot.end_time.slice(2)].join(':') }} -->
-
                 {{ts.data.timeslot.start_time}}-{{ts.data.timeslot.end_time}}
                 <small>
                   {{ts.data.timeslot.classroom}}</small>

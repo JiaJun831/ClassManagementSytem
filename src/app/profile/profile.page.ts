@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { Storage } from '@capacitor/storage';
 import { AlertController } from '@ionic/angular';
 @Component({
@@ -18,7 +18,8 @@ export class ProfilePage implements OnInit {
   constructor(
     private http: HttpClient,
     private activatedRoute: ActivatedRoute,
-    private alertController: AlertController
+    private alertController: AlertController,
+    private router: Router
   ) {}
 
   ngOnInit() {
@@ -64,10 +65,10 @@ export class ProfilePage implements OnInit {
     return this.formData.controls;
   }
 
-  updateProfile() {
+  async updateProfile() {
     this.isSubmitted = true;
     if (!this.formData.valid) {
-      const alert = this.alertController.create({
+      const alert = await this.alertController.create({
         header: 'Please provide all the required values!',
         buttons: [
           {
@@ -76,6 +77,7 @@ export class ProfilePage implements OnInit {
           },
         ],
       });
+      await alert.present();
       return false;
     } else {
       this.getData('userID').then((res) => {
@@ -85,7 +87,24 @@ export class ProfilePage implements OnInit {
               `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/${res}`,
               this.formData.value
             )
-            .subscribe((res) => {});
+            .subscribe(async (res) => {
+              this.http.get(
+                `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/${role}s/email/${this.formData.value.Email}`
+              );
+              const alert = await this.alertController.create({
+                header: 'Update Profile Success!',
+                buttons: [
+                  {
+                    text: 'OK',
+                    role: 'cancel',
+                    handler: () => {
+                      this.router.navigate(['../tabs/setting']);
+                    },
+                  },
+                ],
+              });
+              await alert.present();
+            });
         });
       });
     }
@@ -94,5 +113,10 @@ export class ProfilePage implements OnInit {
   async getData(input: string) {
     const { value } = await Storage.get({ key: input });
     return value;
+  }
+
+  setData(key: string, value: string) {
+    // Store the value under "my-key"
+    Storage.set({ key: key, value: value });
   }
 }

@@ -32,7 +32,7 @@
       </span>
       <ion-item lines="full">
         <ion-label position="floating">Email</ion-label>
-        <ion-input type="email" formControlName="Email" required></ion-input>
+        <ion-input type="email" formControlName="Email" required readonly=""></ion-input>
       </ion-item>
       <span class="error ion-padding" *ngIf="isSubmitted && errorControl.Email.errors?.['required']">
         Email Address is required.
@@ -40,7 +40,6 @@
       <ion-item lines="full">
         <ion-label position="stacked">DOB</ion-label>
         <ion-input type="date" formControlName="DOB" required></ion-input>
-        <!-- <ion-datetime displayFormat="DD/MM/YYYY" presentation="date" formControlName="DOB" required></ion-datetime> -->
       </ion-item>
       <span class="error ion-padding" *ngIf=" isSubmitted  && errorControl.DOB.errors?.['required']">
         DOB is required.

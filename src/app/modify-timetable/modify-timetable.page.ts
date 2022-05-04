@@ -4,10 +4,6 @@ import { Storage } from '@capacitor/storage';
 import { LoadingController, ModalController } from '@ionic/angular';
 import { UpdateTimetableModalComponent } from '../update-timetable-modal/update-timetable-modal.component';
 
-interface moduleList {
-  list: Array<any>;
-}
-
 @Component({
   selector: 'app-modify-timetable',
   templateUrl: './modify-timetable.page.html',
@@ -34,7 +30,7 @@ export class ModifyTimetablePage implements OnInit {
     let text = '';
     let classList = [];
     let timetableList = [];
-    this.getData('user').then((res) => {
+    this.getData('user').then(async (res) => {
       resJson = JSON.parse(res);
       for (let i = 0; i < resJson.module_id.length; i++) {
         let parseValue = parseInt(resJson.module_id[i]);
@@ -43,49 +39,65 @@ export class ModifyTimetablePage implements OnInit {
       let data = {
         text: text.substring(0, text.length - 1),
       };
-      this.http
+      console.log(data);
+      let p = this.http
         .get(
           'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
             date
         )
-        .subscribe((res) => {
-          res['timetable'].forEach((result) => {
-            if (result.active == true) {
-              timetableList.push(result);
-            }
-          });
-        });
+        .toPromise();
 
-      this.http
+      await p;
+      await p.then((res) => {
+        res['timetable'].forEach((result) => {
+          if (result.active == true) {
+            timetableList.push(result);
+          }
+        });
+      });
+
+      let p2 = this.http
         .post(
           'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module',
           data
         )
-        .subscribe((data) => {
-          for (let i = 0; i < Object.keys(data).length; i++) {
-            for (let j = 0; j < timetableList.length; j++) {
-              if (timetableList[j].active != false) {
-                if (timetableList[j].class_id == data[i].id) {
-                  classList.push(data[i]);
-                }
-              }
+        .toPromise();
+
+      await p2;
+
+      await p2.then((res) => {
+        for (let i = 0; i < Object.keys(res).length; i++) {
+          for (let j = 0; j < timetableList.length; j++) {
+            if (timetableList[j].class_id == res[i].id) {
+              classList.push(res[i]);
             }
           }
-          for (let i = 0; i < classList.length; i++) {
-            this.http
-              .get(
-                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
-                  classList[i].data.module_id
-              )
-              .subscribe((res) => {
-                classList[i].data.module_name = res['Name'];
-              });
-          }
-          this.list.push(classList);
-          this.loading.dismiss();
+        }
+      });
+      console.log(classList);
+      let promises = [];
+      for (let i = 0; i < classList.length; i++) {
+        let p = this.http
+          .get(
+            'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/modules/' +
+              classList[i].data.module_id
+          )
+          .toPromise();
+        promises.push(p);
+      }
+
+      await Promise.all(promises);
+      let count = 0;
+      for (let p of promises) {
+        p.then((res) => {
+          classList[count].data.module_name = res.Name;
+          count++;
         });
+      }
+      this.list.push(classList);
+      this.loading.dismiss();
+      return this.list;
     });
-    return this.list;
   }
 
   async openModal(class_id: number, module_id: number, module_name: string) {

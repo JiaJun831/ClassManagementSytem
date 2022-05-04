@@ -14,16 +14,19 @@ export class UpdateTimetableModalComponent implements OnInit {
   @Input() module_name: string;
   updateForm: FormGroup;
   isSubmitted = false;
-  check = false;
+  timetableCheck = 0;
+  roomCheck = 0;
+
+  courseList: any[] = [];
   day = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
-  timetableList: any[] = [];
+  timetable: any[] = [];
   constructor(
     private alertController: AlertController,
     private modalController: ModalController,
     private http: HttpClient
   ) {}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.updateForm = new FormGroup({
       classroom: new FormControl('', Validators.required),
       dayIndex: new FormControl('1'),
@@ -136,7 +139,7 @@ export class UpdateTimetableModalComponent implements OnInit {
             await p.then((res) => {
               res['timetable'].forEach((result) => {
                 if (result.active == true) {
-                  this.timetableList.push(result);
+                  this.timetable.push(result);
                 }
               });
             });
@@ -150,43 +153,14 @@ export class UpdateTimetableModalComponent implements OnInit {
             await p2;
             await p2.then((res) => {
               for (let i = 0; i < Object.keys(res).length; i++) {
-                for (let j = i; j < this.timetableList.length; j++) {
-                  if (res[i].id == this.timetableList[i].class_id) {
+                for (let j = 0; j < this.timetable.length; j++) {
+                  if (res[i].id == this.timetable[j].class_id) {
                     if (
                       res[i].data.timeslot.classroom ==
-                      updateDate.timeslot.classroom
-                    ) {
-                      if (
-                        res[i].data.timeslot.dayIndex ==
-                        updateDate.timeslot.dayIndex
-                      ) {
-                        console.log(res[i]);
-                        if (
-                          (res[i].data.timeslot.start_time.substring(0, 2) >
-                            updateDate.timeslot.start_time.substring(0, 2) &&
-                            res[i].data.timeslot.end_time.substring(0, 2) <
-                              updateDate.timeslot.end_time.substring(0, 2)) ||
-                          (res[i].data.timeslot.start_time.substring(0, 2) >
-                            updateDate.timeslot.start_time.substring(0, 2) &&
-                            res[i].data.timeslot.end_time.substring(0, 2) >
-                              updateDate.timeslot.end_time.substring(0, 2)) ||
-                          updateDate.timeslot.start_time.substring(0, 2) >=
-                            res[i].data.timeslot.end_time.substring(0, 2)
-                        ) {
-                          this.check = true;
-                        } else {
-                          this.check = false;
-                        }
-                      } else {
-                        this.check = true;
-                      }
-                    }
-                  } else {
-                    if (
+                        updateDate.timeslot.classroom &&
                       res[i].data.timeslot.dayIndex ==
-                      updateDate.timeslot.dayIndex
+                        updateDate.timeslot.dayIndex
                     ) {
-                      console.log(res[i]);
                       if (
                         (res[i].data.timeslot.start_time.substring(0, 2) >
                           updateDate.timeslot.start_time.substring(0, 2) &&
@@ -196,26 +170,103 @@ export class UpdateTimetableModalComponent implements OnInit {
                           updateDate.timeslot.start_time.substring(0, 2) &&
                           res[i].data.timeslot.end_time.substring(0, 2) >
                             updateDate.timeslot.end_time.substring(0, 2)) ||
-                        updateDate.timeslot.start_time.substring(0, 2) >=
-                          res[i].data.timeslot.end_time.substring(0, 2)
+                        (res[i].data.timeslot.start_time.substring(0, 2) <
+                          updateDate.timeslot.start_time.substring(0, 2) &&
+                          res[i].data.timeslot.end_time.substring(0, 2) <
+                            updateDate.timeslot.end_time.substring(0, 2))
                       ) {
-                        this.check = true;
+                        this.roomCheck += 0;
                       } else {
-                        this.check = false;
+                        this.roomCheck += 1;
                       }
-                    } else {
-                      this.check = true;
                     }
+                  } else {
+                    this.roomCheck += 0;
                   }
                 }
               }
             });
-            if (this.check == true) {
+
+            let p3 = this.http
+              .get(
+                'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/courses'
+              )
+              .toPromise();
+            await p3;
+            await p3.then((res) => {
+              for (let i = 0; i < Object.keys(res).length; i++) {
+                if (res[i].data.moduleList.includes(this.module_id)) {
+                  this.courseList = res[i].data.moduleList;
+                }
+              }
+            });
+
+            let courseTimetableList = [];
+            await p2;
+            await p2.then((res2) => {
+              for (let i = 0; i < Object.keys(res2).length; i++) {
+                for (let j = 0; j < this.courseList.length; j++) {
+                  if (res2[i].data.module_id == this.courseList[j]) {
+                    courseTimetableList.push(res2[i]);
+                  }
+                }
+              }
+            });
+
+            for (let i = 0; i < courseTimetableList.length; i++) {
+              for (let j = 0; j < this.timetable.length; j++) {
+                if (courseTimetableList[i].id == this.timetable[j].class_id) {
+                  if (
+                    courseTimetableList[i].data.timeslot.dayIndex ==
+                    updateDate.timeslot.dayIndex
+                  ) {
+                    console.log(courseTimetableList[i]);
+                    if (
+                      (courseTimetableList[
+                        i
+                      ].data.timeslot.start_time.substring(0, 2) >
+                        updateDate.timeslot.start_time.substring(0, 2) &&
+                        courseTimetableList[i].data.timeslot.end_time.substring(
+                          0,
+                          2
+                        ) < updateDate.timeslot.end_time.substring(0, 2)) ||
+                      (courseTimetableList[
+                        i
+                      ].data.timeslot.start_time.substring(0, 2) >
+                        updateDate.timeslot.start_time.substring(0, 2) &&
+                        courseTimetableList[i].data.timeslot.end_time.substring(
+                          0,
+                          2
+                        ) > updateDate.timeslot.end_time.substring(0, 2)) ||
+                      (courseTimetableList[
+                        i
+                      ].data.timeslot.start_time.substring(0, 2) <
+                        updateDate.timeslot.start_time.substring(0, 2) &&
+                        courseTimetableList[i].data.timeslot.end_time.substring(
+                          0,
+                          2
+                        ) < updateDate.timeslot.end_time.substring(0, 2))
+                    ) {
+                      this.timetableCheck += 0;
+                    } else {
+                      this.timetableCheck += 1;
+                    }
+                  } else {
+                    this.timetableCheck += 0;
+                  }
+                } else {
+                  this.timetableCheck += 0;
+                }
+              }
+            }
+
+            console.log(this.roomCheck);
+            console.log(this.timetableCheck);
+            if (this.roomCheck == 0 && this.timetableCheck == 0) {
               if (updateWeek == 'week') {
                 this.http
                   .post(
-                    `http://localhost:5000/attendancetracker-a53a9/us-central1/api/timetables/${date}/${this.class_id}`,
-                    // `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
+                    `https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/${date}/${this.class_id}`,
                     { newClass: updateDate }
                   )
                   .subscribe(async (res) => {
@@ -239,9 +290,9 @@ export class UpdateTimetableModalComponent implements OnInit {
                   { newClass: updateDate }
                 );
               }
-            } else {
+            } else if (this.timetableCheck >= 1) {
               const alert = await this.alertController.create({
-                header: 'Cant update',
+                header: 'Cant update -  Timetable duplicated.',
                 buttons: [
                   {
                     text: 'Ok',
@@ -250,6 +301,16 @@ export class UpdateTimetableModalComponent implements OnInit {
                 ],
               });
               await alert.present();
+            } else if (this.roomCheck >= 1) {
+              const alert = await this.alertController.create({
+                header: 'Cant update -  Room not available.',
+                buttons: [
+                  {
+                    text: 'Ok',
+                    role: 'cancel',
+                  },
+                ],
+              });
             }
           });
         }
@@ -269,6 +330,50 @@ export class UpdateTimetableModalComponent implements OnInit {
       }
     }
   }
+
+  async timetableList(date: string) {
+    let timetableList = [];
+    let p2 = this.http
+      .get(
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/timetables/' +
+          date
+      )
+      .toPromise();
+
+    await p2;
+    await p2.then((res) => {
+      res['timetable'].forEach((result) => {
+        if (result.active == true) {
+          timetableList.push(result);
+        }
+      });
+    });
+    return timetableList;
+  }
+
+  async classList(date: string, postData: any) {
+    let timetableList = await this.timetableList(date);
+    let classList = [];
+    let p3 = this.http
+      .post(
+        'https://us-central1-attendancetracker-a53a9.cloudfunctions.net/api/classes/module/',
+        postData
+      )
+      .toPromise();
+
+    await p3;
+    await p3.then((res) => {
+      for (let i = 0; i < Object.keys(res).length; i++) {
+        for (let j = 0; j < timetableList.length; j++) {
+          if (timetableList[j].class_id == res[i].id) {
+            classList.push(res[i]);
+          }
+        }
+      }
+    });
+    return classList;
+  }
+
   async getData(input: string) {
     const { value } = await Storage.get({ key: input });
     return value;

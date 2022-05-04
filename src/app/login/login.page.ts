@@ -3,7 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Storage } from '@capacitor/storage';
-import { AlertController, LoadingController, Platform } from '@ionic/angular';
+import { AlertController, LoadingController } from '@ionic/angular';
 import { AuthServiceService } from '../services/auth-service.service';
 
 @Component({
@@ -19,7 +19,6 @@ export class LoginPage implements OnInit {
   constructor(
     public router: Router,
     private http: HttpClient,
-    private platform: Platform,
     public alertController: AlertController,
     private loadingController: LoadingController,
     private authService: AuthServiceService
@@ -81,6 +80,7 @@ export class LoginPage implements OnInit {
               .subscribe(async (res) => {
                 this.setData('userID', res[0].id);
                 this.setData('user', JSON.stringify(res[0].data));
+                this.setData('course', res[0].data.module_id);
                 this.setData('role', 'lecturer');
                 this.loading.dismiss();
                 this.router.navigate(['../tabs/home']);

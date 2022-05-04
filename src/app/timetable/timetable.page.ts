@@ -1,10 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
 import { Storage } from '@capacitor/storage';
 import { LoadingController, Platform } from '@ionic/angular';
-import { time } from 'console';
-// import { TimetableService } from '../services/timetable.service';
 
 @Component({
   selector: 'app-timetable',
@@ -24,7 +21,7 @@ export class TimetablePage {
   constructor(
     private http: HttpClient,
     private loadingController: LoadingController,
-    private platform: Platform // private timetableService: TimetableService
+    private platform: Platform
   ) {}
 
   ngOnInit(): void {

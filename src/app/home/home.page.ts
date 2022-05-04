@@ -391,7 +391,7 @@ export class HomePage implements OnInit {
             this.nfc
               .addNdefListener(
                 () => {
-                  this.presentAlert('ok');
+                  // this.presentAlert('ok');
                 },
                 (err) => {
                   this.presentAlert('Error : ' + err);
